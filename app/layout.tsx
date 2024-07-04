@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 import Providers from "@/provider/provider";
 export const metadata: Metadata = {
-  title: "Dygsa",
-  description: "Bienvendio a Dygsa",
+  title: "HydroP",
+  description: "Bienvendio a HydroP",
 };
 
 export default function RootLayout({

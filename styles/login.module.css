@@ -1,0 +1,152 @@
+/* Estilos generales */
+.container {
+    display: flex;
+    height: 100vh;
+    position: relative;
+  }
+  
+  .leftPanel {
+    flex: 1;
+    background-color: var(--secondary-color);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: #fff;
+    padding: 20px;
+  }
+  
+  .logo {
+    font-size: 3rem;
+    font-weight: bold;
+  }
+  
+  .image {
+    width: 80%;
+    max-width: 400px;
+    margin-top: 20px;
+  }
+  
+  .rightPanel {
+    flex: 1;
+    background-color: var(--primary-color);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+  }
+  
+  .loginBox {
+    background-color: rgba(0, 0, 0, 0.1); /* Añade una capa semitransparente */
+    border-radius: 10px;
+    padding: 40px;
+    width: 80%;
+    max-width: 400px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    text-align: center;
+  }
+  
+  .title {
+    margin-bottom: 20px;
+  }
+  
+  .inputContainer {
+    position: relative;
+    margin-bottom: 20px;
+    width: 100%;
+  }
+  
+  .input {
+    width: 100%;
+    padding: 10px;
+    padding-left: 40px;
+    border: none;
+    border-radius: 5px;
+    font-size: 1rem;
+    background-color: #fff; /* Fondo blanco para distinguirse del contenedor */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Sombra para inputs */
+  }
+  
+  .icon {
+    position: absolute;
+    top: 50%;
+    left: 10px;
+    transform: translateY(-50%);
+    font-size: 1.2rem;
+  }
+  
+  .forgotPassword {
+    display: block;
+    margin-top: 10px;
+    text-align: right;
+    color: #fff;
+    text-decoration: none;
+  }
+  
+  .loginButton {
+    width: 100%;
+    padding: 10px;
+    background-color: var(--quaternary-color);
+    border: none;
+    border-radius: 5px;
+    color: #fff;
+    font-size: 1rem;
+    cursor: pointer;
+    margin-top: 20px;
+  }
+  
+  .divider {
+    margin: 30px 0;
+    border: none;
+    border-top: 1px solid #fff;
+  }
+  
+  .purchaseSection {
+    color: #fff;
+  }
+  
+  .purchaseLink {
+    color: #fff;
+    text-decoration: underline;
+  }
+  
+  /* Media Queries para dispositivos móviles */
+  @media (max-width: 768px) {
+    .container {
+      flex-direction: column;
+    }
+  
+    .leftPanel {
+      display: none; /* Ocultar el panel izquierdo en dispositivos móviles */
+    }
+  
+    .rightPanel {
+      flex: 1;
+      width: 100%;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      background-color: var(--primary-color); /* Asegura que el fondo sea del color primario */
+    }
+  
+    .loginBox {
+      width: 100%;
+      max-width: 100%;
+      padding: 20px;
+      box-shadow: none;
+      background-color: rgba(0, 0, 0, 0.1); /* Mantiene la semitransparencia */
+    }
+  
+    .mobileImageContainer {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-top: 20px;
+    }
+  
+    .mobileImage {
+      width: 50%;
+      max-width: 300px;
+    }
+  }
+  
