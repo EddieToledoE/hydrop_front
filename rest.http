@@ -1,5 +1,5 @@
 ### Crear usuario 
-POST http://localhost:3001/api/auth/registro
+POST http://localhost:3000/api/auth/registro
 Content-Type: application/json
 
 {

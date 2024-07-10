@@ -1,0 +1,86 @@
+import { Schema, model, models, Document, Model } from "mongoose";
+
+interface IHydroponicSystem extends Document {
+    user: Schema.Types.ObjectId;
+    name: string;
+    plants: Schema.Types.ObjectId[];
+    sensors: {
+        type: 'temperature_humidity' | 'water_temp' | 'ph' | 'ec' | 'water_level';
+        location: string;
+        readings: {
+            type: 'temperature' | 'humidity' | 'water_temp' | 'ph' | 'ec' | 'water_level';
+            timestamp: Date;
+            value: number;
+        }[];
+    }[];
+    actuators: {
+        type: 'pump' | 'nutrient_dispenser';
+        status: 'on' | 'off';
+    }[];
+}
+
+const HydroponicSystemSchema: Schema<IHydroponicSystem> = new Schema(
+    {
+        user: {
+            type: Schema.Types.ObjectId,
+            ref: 'User',
+            required: true
+        },
+        name: {
+            type: String,
+            required: [true, "Nombre necesario"],
+            maxlength: [100, "El nombre no puede exceder 100 caracteres"]
+        },
+        plants: [{
+            type: Schema.Types.ObjectId,
+            ref: 'StationPlant'
+        }],
+        sensors: [{
+            type: {
+                type: String,
+                enum: ['temperature_humidity', 'water_temp', 'ph', 'ec', 'water_level'],
+                required: [true, "Tipo de sensor necesario"]
+            },
+            location: {
+                type: String,
+                required: [true, "Ubicación necesaria"],
+                maxlength: [100, "La ubicación no puede exceder 100 caracteres"]
+            },
+            readings: [{
+                type: {
+                    type: String,
+                    enum: ['temperature', 'humidity', 'water_temp', 'ph', 'ec', 'water_level'],
+                    required: true
+                },
+                timestamp: {
+                    type: Date,
+                    required: true
+                },
+                value: {
+                    type: Number,
+                    required: true
+                }
+            }]
+        }],
+        actuators: [{
+            type: {
+                type: String,
+                enum: ['pump', 'nutrient_dispenser'],
+                required: [true, "Tipo de actuador necesario"]
+            },
+            status: {
+                type: String,
+                enum: ['on', 'off'],
+                required: [true, "Estado necesario"]
+            }
+        }],
+    },
+    {
+        timestamps: true,
+        versionKey: false
+    }
+);
+
+const HydroponicSystem: Model<IHydroponicSystem> = models.HydroponicSystem || model<IHydroponicSystem>("HydroponicSystem", HydroponicSystemSchema);
+
+export default HydroponicSystem;

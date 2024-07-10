@@ -1,12 +1,13 @@
 import { Schema, model, models, Document, Model } from "mongoose";
 
-interface IUsuario extends Document {
+interface IUser extends Document {
     email: string;
     password: string;
     name: string;
+    hydroponicSystems: Schema.Types.ObjectId[];
 }
 
-const UsuarioSchema: Schema<IUsuario> = new Schema(
+const UserSchema: Schema<IUser> = new Schema(
     {
         email: {
             type: String,
@@ -29,6 +30,10 @@ const UsuarioSchema: Schema<IUsuario> = new Schema(
             type: String,
             required: [true, "Nombre necesario"],
         },
+        hydroponicSystems: [{
+            type: Schema.Types.ObjectId,
+            ref: 'HydroponicSystem'
+        }],
     },
     {
         timestamps: true,
@@ -36,6 +41,6 @@ const UsuarioSchema: Schema<IUsuario> = new Schema(
     }
 );
 
-const Usuario: Model<IUsuario> = models.users || model<IUsuario>("users", UsuarioSchema);
+const User: Model<IUser> = models.User || model<IUser>("User", UserSchema);
 
-export default Usuario;
+export default User;

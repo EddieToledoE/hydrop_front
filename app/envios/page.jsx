@@ -1,30 +1,13 @@
 "use client";
 import React from "react";
 import Bar from "@/components/Bar-1.jsx";
-import diseño from "@/styles/Envios.css";
 import styles from "@/app/Home.css";
 import Header from "@/components/Header.jsx";
 import { closeBar, openBar } from "@/store/barSlice";
 import { useSelector, useDispatch } from "react-redux";
 import estiloinfo from "@/styles/inventario.css";
-import { red } from "@mui/material/colors";
-import Pedidos from "components/hacerPedido";
-import Cliente from "components/registrarCliente";
 import Axios from "axios";
-
-import {
-  DataGrid,
-  GridColumnHeaderFilterIconButton,
-  GridPagination,
-  GridToolbar,
-  GridToolbarExport,
-  GridToolbarFilterButton,
-} from "@mui/x-data-grid";
-import {
-  GridToolbarContainer,
-  GridToolbarDensitySelector,
-} from "@mui/x-data-grid";
-import { Avatar, Grid } from "@mui/material";
+import Calendario from "@/components/Calendario2";
 import { useState, useEffect } from "react";
 function Envios() {
   const Swal = require("sweetalert2");
@@ -45,7 +28,7 @@ function Envios() {
   const hola = isBarOpen ? "hola-true" : "hola";
   const inv = isBarOpen ? "inv-open" : "inv";
   const protector = isBarOpen ? "protectorOpen" : "protector";
-  const avisos = isBarOpen ? "avisos-true" : "avisos";
+  const avisos = isBarOpen ? "avisos-estacion-true" : "avisos-estacion";
   const [claseDiv, setClaseDiv] = useState("Registrar-close");
   const [claseDiv2, setClaseDiv2] = useState("Registrar-close2");
   const [claseF, setclaseF] = useState("Fondo-Close");
@@ -75,43 +58,7 @@ function Envios() {
     console.log(claseDiv);
   };
 
-  const [envios, setEnvios] = useState([]);
 
-  const ruta = "/api/auth/envio";
-  const getData = async () => {
-    try {
-      const response = await Axios.get(ruta);
-      const data = response.data;
-      setEnvios(data);
-    } catch (error) {
-      console.error("Error al obtener los datos:", error);
-    }
-  };
-
-  useEffect(() => {
-    getData();
-  }, []);
-
-  const [cantidadTotal, setCantidadTotal] = useState(0);
-  const [cantidadEntregados, setCantidadEntregados] = useState(0);
-  const [cantidadNoEntregados, setCantidadNoEntregados] = useState(0);
-
-  useEffect(() => {
-    const obtenerCantidades = async () => {
-      try {
-        const response = await Axios.get("/api/auth/envio/contador");
-
-        setCantidadTotal(response.data.cantidadTotal);
-        setCantidadEntregados(response.data.cantidadEntregados);
-        setCantidadNoEntregados(response.data.cantidadNoEntregados);
-      } catch (error) {
-        console.error("Error al obtener cantidades:", error);
-        // Manejar el error según tus necesidades
-      }
-    };
-
-    obtenerCantidades();
-  }, []);
 
   return (
     <section className="seccion1">
@@ -124,28 +71,43 @@ function Envios() {
         <Header />
 
         <div className={avisos}>
-          <div className="citas">
+          <div className="estacion-container">
             <div className="Citas">
-              <a className="titulo-citas">Estacion : </a>
+              <a className="titulo-citas">Estacion</a>
             </div>
-            <div className="citas-pendientes">
-              <div className="inf"></div>
-            </div>
-
-            <div className="inventario-pendiente">
+            <div className="estacion-informacion">
               <div className="inf"></div>
             </div>
           </div>
-          <div className="inventario">
+          <div className="estacion-container">
             <div className="Citas">
-              <a className="titulo-citas">Opciones</a>
+              <a className="titulo-citas">Cosechas</a>
             </div>
-            <div className="citas-pendientes">
-              <div className="inf"></div>
-            </div>
-
-            <div className="inventario-pendiente">
-              <div className="inf"></div>
+            <div className="estacion-informacion">
+            <div
+                style={{
+                  width: "70%",
+                  height: "95%",
+                  fontSize: "11px",
+                  textTransform: "uppercase",
+                  fontWeight: "100",
+                  marginTop: "40px", 
+                  textAlign: "center",
+                  display: "flex",
+                  flexDirection: "column",
+                }}
+              >
+                <Calendario />
+                <a className="estacion-cosecha" >Control de los cultivos</a>
+                <button>Añadir cultivos</button>
+                <a >Espacios utilizados : n /24</a>
+                <div>
+                  <a >Cultivo 1</a>
+                  <a >Cultivo 2</a>
+                  <a >Cultivo 3</a>
+                </div>
+              </div>
+               
             </div>
           </div>
         </div>
