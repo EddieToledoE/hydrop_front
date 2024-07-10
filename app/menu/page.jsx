@@ -31,7 +31,7 @@ function MetricCard({ name, value, level }) {
     normal: "green",
     medium: "yellow",
   };
-  
+
   return (
     <div className="metric-card">
       <div className="metric-name">{name}</div>
@@ -41,7 +41,7 @@ function MetricCard({ name, value, level }) {
 }
 
 export default function Home() {
-  const isBarOpen = useSelector(state => state.bar.isBarOpen);
+  const isBarOpen = useSelector((state) => state.bar.isBarOpen);
   const { data: session } = useSession();
   console.log(session);
   const dispatch = useDispatch();
@@ -60,7 +60,9 @@ export default function Home() {
   useEffect(() => {
     const fetchWeatherData = async () => {
       try {
-        const response = await Axios.get(`https://api.openweathermap.org/data/2.5/forecast?q=${city}&appid=${apiKey}&units=metric`);
+        const response = await Axios.get(
+          `https://api.openweathermap.org/data/2.5/forecast?q=${city}&appid=${apiKey}&units=metric`
+        );
         const hourlyForecast = response.data.list.slice(0, 4); // Pronóstico para las próximas 12 horas (cada 3 horas)
         setWeatherData(hourlyForecast);
       } catch (error) {
@@ -93,18 +95,24 @@ export default function Home() {
               <a className="titulo-citas">Clima en tu ciudad</a>
             </div>
             <div className="citas-pendientes">
-              <div className="inf">
+              <div className="weather-container">
                 {error && <p>{error}</p>}
                 {weatherData.length > 0 && (
-                  <ul>
+                  <div className="weather-forecast">
                     {weatherData.map((forecast, index) => (
-                      <li key={index}>
-                        <p>Hora: {new Date(forecast.dt_txt).toLocaleTimeString()}</p>
-                        <p>Temperatura: {forecast.main.temp}°C</p>
-                        <p>Condición: {forecast.weather[0].description}</p>
-                      </li>
+                      <div key={index} className="weather-item">
+                        <p className="weather-time">
+                          Hora: {new Date(forecast.dt_txt).toLocaleTimeString()}
+                        </p>
+                        <p className="weather-temp">
+                          Temp: {forecast.main.temp}°C
+                        </p>
+                        <p className="weather-desc">
+                          Condición: {forecast.weather[0].description}
+                        </p>
+                      </div>
                     ))}
-                  </ul>
+                  </div>
                 )}
               </div>
             </div>
@@ -128,43 +136,65 @@ export default function Home() {
         </div>
         <div className={tabla}>
           <div className="mas-vendidos">
-          <div className="inventario">
-            <div className="Citas">
-              <a className="titulo-citas">Accionadores</a>
-            </div>
-            <div className="citas-pendientes">
-              <div className="inf">
-                <button className="citas-inf">Encender/Apagar</button>
+            <div className="inventario">
+              <div className="Citas">
+                <a className="titulo-citas">Sensor</a>
+              </div>
+              <div className="citas-pendientes">
+                <div className="inf">
+                  <button className="citas-inf">Temperatura : </button>
+                </div>
+              </div>
+              <div className="linea"></div>
+              <div className="inventario-pendiente">
+                <div className="inf">
+                  <button className="citas-inf">Humedad : </button>
+                </div>
               </div>
             </div>
-            <div className="linea"></div>
-            <div className="inventario-pendiente">
-              <div className="inf">
-                <button className="citas-inf">Dispensar</button>
+            <div className="inventario">
+              <div className="Citas">
+                <a className="titulo-citas">Sensor</a>
+              </div>
+              <div className="citas-pendientes">
+                <div className="inf">
+                  <button className="citas-inf">pH :</button>
+                </div>
+              </div>
+              <div className="linea"></div>
+              <div className="inventario-pendiente">
+                <div className="inf">
+                  <button className="citas-inf">Conductividad : </button>
+                </div>
               </div>
             </div>
-          </div>
-          <div className="inventario">
-            <div className="Citas">
-              <a className="titulo-citas">Accionadores</a>
-            </div>
-            <div className="citas-pendientes">
-              <div className="inf">
-                <button className="citas-inf">Encender/Apagar</button>
+            <div className="inventario">
+              <div className="Citas">
+                <a className="titulo-citas">Sensor</a>
+              </div>
+              <div className="citas-pendientes">
+                <div className="inf-sensores">
+                  <button className="citas-inf">Temperatura Agua : </button>
+                  <a> Recomendación :</a>
+                </div>
+              </div>
+              <div className="linea"></div>
+              <div className="inventario-pendiente">
+                <div className="inf">
+                  <button className="citas-inf">Nivel Agua : </button>
+                </div>
               </div>
             </div>
-            <div className="linea"></div>
-            <div className="inventario-pendiente">
-              <div className="inf">
-                <button className="citas-inf">Dispensar</button>
-              </div>
-            </div>
-          </div>
             {/* <div className="metricas-container">
               <h2>Métricas</h2>
               <div className="metricas">
                 {sensorData.map((sensor, index) => (
-                  <MetricCard key={index} name={sensor.name} value={sensor.value} level={sensor.level} />
+                  <MetricCard
+                    key={index}
+                    name={sensor.name}
+                    value={sensor.value}
+                    level={sensor.level}
+                  />
                 ))}
               </div>
               <h3>Recomendaciones</h3>
