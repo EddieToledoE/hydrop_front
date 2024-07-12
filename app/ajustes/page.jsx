@@ -2,7 +2,7 @@
 import Axios, { AxiosError } from "axios";
 import { FormEvent, useState } from "react";
 import Bar from "@/components/Bar-1";
-import Header from "@/components/Header_ajustes";
+import Header from "@/components/Header";
 import "@/styles/Ajustes.css";
 import { useSelector, useDispatch } from "react-redux";
 import { closeBar, openBar } from "@/store/barSlice";
