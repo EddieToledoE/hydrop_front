@@ -1,0 +1,45 @@
+.toggleContainer{
+    --width: 90px;
+    --radius: 30px;
+    position: relative;
+    width: var(--width);
+    height: var(--radius);;
+    background: lightgray;
+    border-radius: var(--radius); 
+}
+
+.toggle{
+    position: absolute;
+    width: 0;
+    height: 0;
+}
+
+.toggle + .switch{
+    position:absolute;
+    top:0;
+    left:0;
+    display: block;
+    width: var(--radius);
+    height: var(--radius);
+    cursor: pointer;
+    background:#a6d97a;
+    border-radius: var(--radius);
+    transition: width 1s;
+}
+
+.toggle + .switch:before{
+    content:"";
+    position: absolute;
+    width: var(--radius);
+    height: var(--radius);
+    top: 50%;
+    transform: translateY(-50%);
+    background: #320c0c;
+    border-radius: 50%;
+    margin: 0px 2px;
+    left: calc(100% - var(--radius));
+    cursor: pointer
+}
+.toggle:checked + .switch{
+    width: var(--width);
+}

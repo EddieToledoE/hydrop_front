@@ -1,4 +1,4 @@
-"use client";
+"use client"
 import Header from "@/components/Header";
 import estios from "app/Home.css";
 import Logo from "@/public/logo.png";
@@ -8,15 +8,16 @@ import { useSelector, useDispatch } from "react-redux";
 import { useState, useEffect } from "react";
 import Axios from "axios";
 import { useSession } from "next-auth/react";
+import ToggleSwitch from "components/ToggleSwitch";
 
 const apiKey = "002501a48460cb00c15f9e2bcf247347";
 const city = "Suchiapa";
 
 const sensorData = [
-  { name: "Temp.", value: 25, level: "normal" }, // Ejemplo de datos
-  { name: "pH", value: 7, level: "normal" },
-  { name: "Humedad", value: 60, level: "medium" },
-  { name: "Nivel de agua", value: 30, level: "low" },
+  { value: 25, level: "normal" },
+  { value: 7, level: "normal" },
+  { value: 60, level: "medium" },
+  { value: 30, level: "low" },
 ];
 
 const recommendations = [
@@ -25,17 +26,21 @@ const recommendations = [
   "Verificar la humedad.",
 ];
 
-function MetricCard({ name, value, level }) {
+function MetricCard({ value, level }) {
   const levelColors = {
     low: "red",
     normal: "green",
     medium: "yellow",
   };
 
+  const valueColorClass = level === "low" || level === "normal" || level === "medium"
+    ? "white" : "";
+
   return (
-    <div className="metric-card">
-      <div className="metric-name">{name}</div>
-      <div className={`metric-value ${levelColors[level]}`}>{value}</div>
+    <div className="metric-card-container">
+      <div className={`metric-card ${levelColors[level]}`}>
+      <div className={`metric-value ${valueColorClass}`}>{value}</div>
+      </div>
     </div>
   );
 }
@@ -123,18 +128,19 @@ export default function Home() {
             </div>
             <div className="citas-pendientes">
               <div className="inf">
-                <button className="citas-inf">Encender/Apagar</button>
+                <a className="custom-link">Apagado/Encendido</a>
+                <ToggleSwitch />
               </div>
             </div>
             <div className="linea"></div>
             <div className="inventario-pendiente">
               <div className="inf">
-                <button className="citas-inf">Dispensar</button>
+                <button className="dispensar">Dispensar</button>
               </div>
             </div>
           </div>
         </div>
-        <div className={tabla}>
+        <div className="tabla">
           <div className="mas-vendidos">
             <div className="inventario">
               <div className="Citas">
@@ -142,13 +148,15 @@ export default function Home() {
               </div>
               <div className="citas-pendientes">
                 <div className="inf">
-                  <button className="citas-inf">Temperatura : </button>
+                  <h2 className="citas-inf">Temperatura:</h2>
+                  <MetricCard value={sensorData[0].value} level={sensorData[0].level} />
                 </div>
               </div>
               <div className="linea"></div>
               <div className="inventario-pendiente">
                 <div className="inf">
-                  <button className="citas-inf">Humedad : </button>
+                  <h2 className="citas-inf">Humedad:</h2>
+                  <MetricCard value={sensorData[2].value} level={sensorData[2].level} />
                 </div>
               </div>
             </div>
@@ -158,13 +166,15 @@ export default function Home() {
               </div>
               <div className="citas-pendientes">
                 <div className="inf">
-                  <button className="citas-inf">pH :</button>
+                  <h2 className="citas-inf">pH:</h2>
+                  <MetricCard value={sensorData[1].value} level={sensorData[1].level} />
                 </div>
               </div>
               <div className="linea"></div>
               <div className="inventario-pendiente">
                 <div className="inf">
-                  <button className="citas-inf">Conductividad : </button>
+                  <h2 className="citas-inf">Conductividad:</h2>
+                  <MetricCard value={sensorData[3].value} level={sensorData[3].level} />
                 </div>
               </div>
             </div>
@@ -174,37 +184,24 @@ export default function Home() {
               </div>
               <div className="citas-pendientes">
                 <div className="inf-sensores">
-                  <button className="citas-inf">Temperatura Agua : </button>
-                  <a> Recomendación :</a>
+                  <div className="inf">
+                    <h2 className="citas-inf">T. Agua:</h2>
+                    <MetricCard value={sensorData[0].value} level={sensorData[0].level} />
+                  </div>
                 </div>
               </div>
               <div className="linea"></div>
               <div className="inventario-pendiente">
                 <div className="inf">
-                  <button className="citas-inf">Nivel Agua : </button>
+                  <h2 className="citas-inf">Nivel Agua:</h2>
+                  <MetricCard value={sensorData[3].value} level={sensorData[3].level} />
                 </div>
               </div>
             </div>
-            {/* <div className="metricas-container">
-              <h2>Métricas</h2>
-              <div className="metricas">
-                {sensorData.map((sensor, index) => (
-                  <MetricCard
-                    key={index}
-                    name={sensor.name}
-                    value={sensor.value}
-                    level={sensor.level}
-                  />
-                ))}
-              </div>
-              <h3>Recomendaciones</h3>
-              <ul>
-                {recommendations.map((rec, index) => (
-                  <li key={index}>{rec}</li>
-                ))}
-              </ul>
-            </div> */}
           </div>
+        </div>
+        <div className="">
+          <a> Recomendación :</a>
         </div>
       </div>
     </section>

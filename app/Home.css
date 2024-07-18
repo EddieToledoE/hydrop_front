@@ -79,6 +79,7 @@ body {
   width: 100%;
   display: flex;
   justify-content: center;
+  
 }
 .estacion-informacion {
   height: auto;
@@ -87,7 +88,10 @@ body {
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  overflow-y: auto; /* Add scroll if content exceeds height */
+  max-height: 300px; /* Adjust as needed */
 }
+
 .estacion-cosecha {
   color: var(--grey-grey-600, #5d6679);
   font-family: Inter;
@@ -96,7 +100,27 @@ body {
   font-weight: 550;
   line-height: 24px; /* 150% */
   font-family: "Inter", sans-serif;
+  margin-bottom: 10px; /* Provides space below the title */
 }
+
+/* Adjustments for scrollbar appearance */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
 a {
   font-family: "Inter", sans-serif;
 }
@@ -126,12 +150,19 @@ a {
   margin-top: 20px;
 }
 
+.custom-link {
+  font-family: "Nunito", sans-serif;
+  font-weight: 1000;
+  font-size: 16px;
+}
+
 .inf-sensores {
   display: flex;
   align-items: center;
   justify-content: center;
   flex-direction: row;
   margin-top: 0px;
+  border: #383e49 2px;
 }
 .inf-inventario {
   display: flex;
@@ -143,14 +174,41 @@ a {
 }
 .citas-inf {
   color: var(--grey-grey-600, #5d6679);
-  font-family: Inter;
-  font-size: 16px;
-  font-style: normal;
-  font-weight: 500;
-  line-height: 24px; /* 150% */
-  cursor: pointer;
   font-family: "Inter", sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.5;
+  cursor: pointer;
   margin-top: 20px;
+  margin-right: 200px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: background-color 0.3s ease;
+  width: 150px;
+  text-align: right; 
+}
+
+
+.citas-inf:hover {
+  background-color: #f0f0f0;
+}
+
+.dispensar {
+  color: var(--grey-grey-600, #5d6679);
+  font-family: "Inter", sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.5;
+  cursor: pointer;
+  margin-top: 10px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: background-color 0.3s ease;
+  width: 150px;
 }
 .citas-inf {
   text-align: center;
@@ -319,37 +377,52 @@ a {
   gap: 10px;
 }
 
+.metric-card-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: -40px;
+}
+
 .metric-card {
   display: flex;
-  justify-content: space-between;
+  width: auto; /* Ancho automático para ajustar el contenido */
   align-items: center;
+  justify-content: center;
   background-color: #ffffff;
   padding: 10px;
   border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin-left: 229px; /* Ajusta según sea necesario */
 }
 
-.metric-name {
+.metric-value {
   font-weight: bold;
+  font-family: Inter;
 }
 
-.metric-value.red {
-  color: red;
+.metric-card.red {
+  background-color: red;
 }
 
-.metric-value.green {
-  color: green;
+.metric-card.green {
+  background-color: green;
 }
 
-.metric-value.yellow {
-  color: orange;
+.metric-card.yellow {
+  background-color: rgb(215, 215, 79);
 }
+
+.metric-value.white {
+  color: #ffffff;
+}
+
 
 .weather-container {
   background-color: #ffffff;
   padding: 30px;
+  padding-top: 50px;
   border-radius: 8px;
-  width: 100%;
+  width: 200%;
 }
 
 .weather-forecast {
@@ -388,56 +461,56 @@ a {
   height: 95%;
 }
 @media (max-width: 800px) {
-  .hola,
-  .hola-true {
-    border: none;
-    width: 100%;
-    padding-left: 0px;
-    margin: 0px;
-    flex: 0 0 1;
-    background-color: #f0f1f3;
-  }
-  .hola-true {
-    opacity: 1.5;
-    background-color: rgba(0, 0, 0, 0.742);
-  }
-  .grafica-true,
-  .avisos-true,
-  .tabla-true {
-    opacity: 0.5;
-  }
-  .seccion1 {
-    width: 100%;
-    margin: 0px;
-    padding: 0px;
-  }
-  .grafica,
-  .grafica-true {
-    margin-top: 5px;
-    margin-bottom: 5px;
-    width: 100%;
-    border: none;
-  }
+    .hola,
+    .hola-true {
+      border: none;
+      width: 100%;
+      padding-left: 0px;
+      margin: 0px;
+      flex: 0 0 1;
+      background-color: #f0f1f3;
+    }
+    .hola-true {
+      opacity: 1.5;
+      background-color: rgba(0, 0, 0, 0.742);
+    }
+    .grafica-true,
+    .avisos-true,
+    .tabla-true {
+      opacity: 0.5;
+    }
+    .seccion1 {
+      width: 100%;
+      margin: 0px;
+      padding: 0px;
+    }
+    .grafica,
+    .grafica-true {
+      margin-top: 5px;
+      margin-bottom: 5px;
+      width: 100%;
+      border: none;
+    }
 
-  .avisos,
-  .avisos-true {
+    .avisos,
+    .avisos-true {
+      display: flex;
+      flex-direction: column;
+      padding-top: 0px;
+      border: none;
+      width: 100%;
+      height: 27%;
+    }
+
+  .avisos-estacion,
+  .avisos-estacion-true {
     display: flex;
     flex-direction: column;
     padding-top: 0px;
     border: none;
     width: 100%;
-    height: 27%;
+    height: 100%;
   }
-
-.avisos-estacion,
-.avisos-estacion-true {
-  display: flex;
-  flex-direction: column;
-  padding-top: 0px;
-  border: none;
-  width: 100%;
-  height: 100%;
-}
   .citas {
     width: 100%;
     margin: 0px;
@@ -473,7 +546,7 @@ a {
     flex-direction: column;
   }
 
-  .weather-container {
+  /* .weather-container {
     background-color: #ffffff;
     padding: 10px;
     border-radius: 8px;
@@ -484,19 +557,143 @@ a {
     border-radius: 8px;
     font-family: Inter;
     font-size: 12px;
-  }
+  } */
 }
 .Tamaño-Calendario h2,
 .Tamaño-Calendario a,
 .Tamaño-Calendario .fc-event-title {
   font-weight: 100;
   cursor: pointer;
+
 }
 .Tamaño-Calendario .fc-footer-toolbar {
   display: flex;
   flex-wrap: wrap;
+
 }
 
 .fc-event-time {
   display: none;
+}
+
+.timerDisplay {
+  font-family: Inter;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: #f5f5f5;
+  border: 2px solid #ddd;
+  border-radius: 10px;
+  padding: 20px;
+  margin-top: 20px;
+}
+
+.timerDisplay h3 {
+  margin: 0;
+  font-size: 1.5rem;
+  color: #333;
+}
+
+.timerDisplay p {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #333;
+  background: #222;
+  color: #fff;
+  padding: 10px 20px;
+  border-radius: 10px;
+  margin-top: 10px;
+  font-family: 'Courier New', Courier, monospace;
+}
+
+.clock-style {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.Envios-Button {
+    cursor: pointer;
+    display: inline-flex;
+    padding: 10px 16px;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    border: none;
+    border-radius: 4px;
+    background: var(--primary-primary-600, #108204);
+    margin-right: 10px;
+    color: white;
+    font-family: Inter;
+}
+
+.modal {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    font-family: Inter;
+}
+
+.modal-content {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.close-button {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 24px;
+    cursor: pointer;
+}
+
+.modal-button {
+    margin-top: 20px;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    background: var(--primary-primary-600, #108204);
+    color: white;
+    cursor: pointer;
+    font-family: Inter;
+}
+
+.cultivos-list {
+  margin-top: 20px;
+}
+
+.cultivo-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  padding: 10px;
+  background-color: #f0f1f3;
+  border-radius: 5px;
+}
+
+.cultivo-item a {
+  font-family: "Inter", sans-serif;
+  font-size: 14px;
+  color: #383e49;
+}
+
+.delete-button {
+  padding: 5px 10px;
+  background-color: #ff4d4f;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.delete-button:hover {
+  background-color: #ff7875;
 }
