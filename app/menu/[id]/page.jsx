@@ -8,23 +8,10 @@ import { useSelector, useDispatch } from "react-redux";
 import { useState, useEffect } from "react";
 import Axios from "axios";
 import { useSession } from "next-auth/react";
-import ToggleSwitch from "components/ToggleSwitch";
 import { io } from "socket.io-client";
 import { useRouter } from "next/navigation";
+import { set } from "mongoose";
 const apiKey = "002501a48460cb00c15f9e2bcf247347";
-
-const sensorData = [
-  { value: 25, level: "normal" },
-  { value: 7, level: "normal" },
-  { value: 60, level: "medium" },
-  { value: 30, level: "low" },
-];
-
-const recommendations = [
-  "Revisar el nivel de agua.",
-  "Ajustar el pH.",
-  "Verificar la humedad.",
-];
 
 function MetricCard({ value, level }) {
   const levelColors = {
@@ -57,12 +44,13 @@ export default function Home() {
   const [city, setCity] = useState("");
   const [sensorData, setSensorData] = useState({});
   const [actuatorStatus, setActuatorStatus] = useState({});
-
+  const [stationName, setStationName] = useState("");
   useEffect(() => {
     if (stationId) {
       Axios.get(`/api/auth/stations/${stationId}`)
         .then((response) => {
           setCity(response.data.city);
+          setStationName(response.data.name);
         })
         .catch((error) => {
           console.error("Error al obtener datos de la estación:", error);
@@ -161,17 +149,14 @@ export default function Home() {
           </div>
           <div className="inventory-card">
             <div className="card-title">
-              <a className="title">Accionadores</a>
+              <a className="title">Accionadores de : {stationName ? stationName : 'Tu estacion'}</a>
             </div>
             <div className="card-content">
-              <div className="info">
-                <a className="link">Apagado/Encendido</a>
-                <ToggleSwitch isOn={actuatorStatus.pump_status === 'on'} />
-              </div>
-            </div>
-            <div className="divider"></div>
-            <div className="card-content">
-              <div className="info">
+              <div className="info-row">
+                <button className={`status-button ${actuatorStatus.pump_status === 'on' ? 'on' : 'off'}`}>
+                  {actuatorStatus.pump_status === 'on' ? 'Encendido' : 'Apagado'}
+                </button>
+                <div className="vertical-divider"></div>
                 <button className="dispensar">Dispensar</button>
               </div>
             </div>
