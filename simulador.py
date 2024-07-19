@@ -1,6 +1,7 @@
 import paho.mqtt.client as mqtt
 import random
 import time
+import json
 
 # Configuración del broker MQTT de CloudAMQP
 broker_url = "toad.rmq.cloudamqp.com"
@@ -63,12 +64,13 @@ try:
             "actuator_status": actuator_status
         }
 
-        result = client.publish(topic, str(message))
+        json_message = json.dumps(message)  # Convertir el mensaje a JSON
+        result = client.publish(topic, json_message)  # Enviar el mensaje como JSON
         result.wait_for_publish()
 
-        print(f"Mensaje publicado: {message}")
+        print(f"Mensaje publicado: {json_message}")
 
-        time.sleep(10)  # Espera de 5 segundos antes de enviar el siguiente mensaje
+        time.sleep(10)  # Espera de 10 segundos antes de enviar el siguiente mensaje
 except KeyboardInterrupt:
     print("Interrupción del usuario. Desconectando...")
 
