@@ -1,7 +1,7 @@
-"use client"
+"use client";
 import Header from "@/components/Header";
-import estios from "app/Home.css";
-import Logo from "@/public/logo.png";
+import estios from "@/styles/menu-id.css";
+import { usePathname } from "next/navigation";
 import Bar from "@/components/Bar-1";
 import { closeBar, openBar } from "@/store/barSlice";
 import { useSelector, useDispatch } from "react-redux";
@@ -9,9 +9,9 @@ import { useState, useEffect } from "react";
 import Axios from "axios";
 import { useSession } from "next-auth/react";
 import ToggleSwitch from "components/ToggleSwitch";
+import { useRouter } from "next/navigation";
 
 const apiKey = "002501a48460cb00c15f9e2bcf247347";
-const city = "Suchiapa";
 
 const sensorData = [
   { value: 25, level: "normal" },
@@ -39,7 +39,7 @@ function MetricCard({ value, level }) {
   return (
     <div className="metric-card-container">
       <div className={`metric-card ${levelColors[level]}`}>
-      <div className={`metric-value ${valueColorClass}`}>{value}</div>
+        <div className={`metric-value ${valueColorClass}`}>{value}</div>
       </div>
     </div>
   );
@@ -48,8 +48,25 @@ function MetricCard({ value, level }) {
 export default function Home() {
   const isBarOpen = useSelector((state) => state.bar.isBarOpen);
   const { data: session } = useSession();
-  console.log(session);
   const dispatch = useDispatch();
+  const router = useRouter();
+  const idDinamico = usePathname();
+  const arreglo = idDinamico.split("/");
+  const stationId = arreglo[arreglo.length - 1];
+
+  const [city, setCity] = useState("");
+
+  useEffect(() => {
+    if (stationId) {
+      Axios.get(`/api/auth/stations/${stationId}`)
+        .then((response) => {
+          setCity(response.data.city);
+        })
+        .catch((error) => {
+          console.error("Error al obtener datos de la estación:", error);
+        });
+    }
+  }, [stationId]);
 
   const handleDivClick = () => {
     const windowWidth = window.innerWidth;
@@ -63,43 +80,40 @@ export default function Home() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    const fetchWeatherData = async () => {
-      try {
-        const response = await Axios.get(
-          `https://api.openweathermap.org/data/2.5/forecast?q=${city}&appid=${apiKey}&units=metric`
-        );
-        const hourlyForecast = response.data.list.slice(0, 4); // Pronóstico para las próximas 12 horas (cada 3 horas)
-        setWeatherData(hourlyForecast);
-      } catch (error) {
-        setError("Error al obtener datos del clima");
-        console.error("Error al obtener datos del clima:", error);
-      }
-    };
-    fetchWeatherData();
-  }, []);
+    if (city) {
+      const fetchWeatherData = async () => {
+        try {
+          const response = await Axios.get(
+            `https://api.openweathermap.org/data/2.5/forecast?q=${city}&appid=${apiKey}&units=metric`
+          );
+          const hourlyForecast = response.data.list.slice(0, 4);
+          setWeatherData(hourlyForecast);
+        } catch (error) {
+          setError("Error al obtener datos del clima");
+          console.error("Error al obtener datos del clima:", error);
+        }
+      };
+      fetchWeatherData();
+    }
+  }, [city]);
 
-  const hola = isBarOpen ? "hola-true" : "hola";
-  const grafica = isBarOpen ? "grafica-true" : "grafica";
-  const avisos = isBarOpen ? "avisos-true" : "avisos";
-  const tabla = isBarOpen ? "tabla-true" : "tabla";
-  const imageStyle = {
-    borderRadius: "2px",
-    position: "absolute",
-  };
+  const mainContentClass = isBarOpen ? "main-content-active" : "main-content";
+  const weatherInfoClass = isBarOpen ? "weather-info-active" : "weather-info";
+  const tableClass = isBarOpen ? "table-active" : "table";
 
   return (
-    <section className="seccion1">
-      <div className="bar1">
+    <section className="section">
+      <div className="sidebar">
         <Bar />
       </div>
-      <div className={hola} onClick={handleDivClick}>
+      <div className={mainContentClass} onClick={handleDivClick}>
         <Header />
-        <div className={avisos}>
-          <div className="citas">
-            <div className="Citas">
-              <a className="titulo-citas">Clima en tu ciudad</a>
+        <div className={weatherInfoClass}>
+          <div className="card">
+            <div className="card-title">
+              <a className="title">Clima en {city}</a>
             </div>
-            <div className="citas-pendientes">
+            <div className="card-content">
               <div className="weather-container">
                 {error && <p>{error}</p>}
                 {weatherData.length > 0 && (
@@ -122,86 +136,76 @@ export default function Home() {
               </div>
             </div>
           </div>
-          <div className="inventario">
-            <div className="Citas">
-              <a className="titulo-citas">Accionadores</a>
+          <div className="inventory-card">
+            <div className="card-title">
+              <a className="title">Accionadores</a>
             </div>
-            <div className="citas-pendientes">
-              <div className="inf">
-                <a className="custom-link">Apagado/Encendido</a>
+            <div className="card-content">
+              <div className="info">
+                <a className="link">Apagado/Encendido</a>
                 <ToggleSwitch />
               </div>
             </div>
-            <div className="linea"></div>
-            <div className="inventario-pendiente">
-              <div className="inf">
+            <div className="divider"></div>
+            <div className="card-content">
+              <div className="info">
                 <button className="dispensar">Dispensar</button>
               </div>
             </div>
           </div>
         </div>
-        <div className="tabla">
-          <div className="mas-vendidos">
-            <div className="inventario">
-              <div className="Citas">
-                <a className="titulo-citas">Sensor</a>
-              </div>
-              <div className="citas-pendientes">
-                <div className="inf">
-                  <h2 className="citas-inf">Temperatura:</h2>
-                  <MetricCard value={sensorData[0].value} level={sensorData[0].level} />
-                </div>
-              </div>
-              <div className="linea"></div>
-              <div className="inventario-pendiente">
-                <div className="inf">
-                  <h2 className="citas-inf">Humedad:</h2>
-                  <MetricCard value={sensorData[2].value} level={sensorData[2].level} />
-                </div>
-              </div>
+        <div className={tableClass}>
+          <div className="inventory-card">
+            <div className="card-title">
+              <a className="title">Temperatura:</a>
             </div>
-            <div className="inventario">
-              <div className="Citas">
-                <a className="titulo-citas">Sensor</a>
-              </div>
-              <div className="citas-pendientes">
-                <div className="inf">
-                  <h2 className="citas-inf">pH:</h2>
-                  <MetricCard value={sensorData[1].value} level={sensorData[1].level} />
-                </div>
-              </div>
-              <div className="linea"></div>
-              <div className="inventario-pendiente">
-                <div className="inf">
-                  <h2 className="citas-inf">Conductividad:</h2>
-                  <MetricCard value={sensorData[3].value} level={sensorData[3].level} />
-                </div>
-              </div>
+            <div className="card-content">
+              <MetricCard value={sensorData[0].value} level={sensorData[0].level} />
             </div>
-            <div className="inventario">
-              <div className="Citas">
-                <a className="titulo-citas">Sensor</a>
-              </div>
-              <div className="citas-pendientes">
-                <div className="inf-sensores">
-                  <div className="inf">
-                    <h2 className="citas-inf">T. Agua:</h2>
-                    <MetricCard value={sensorData[0].value} level={sensorData[0].level} />
-                  </div>
-                </div>
-              </div>
-              <div className="linea"></div>
-              <div className="inventario-pendiente">
-                <div className="inf">
-                  <h2 className="citas-inf">Nivel Agua:</h2>
-                  <MetricCard value={sensorData[3].value} level={sensorData[3].level} />
-                </div>
-              </div>
+          </div>
+          <div className="inventory-card">
+            <div className="card-title">
+              <a className="title">Humedad:</a>
+            </div>
+            <div className="card-content">
+              <MetricCard value={sensorData[2].value} level={sensorData[2].level} />
+            </div>
+          </div>
+          <div className="inventory-card">
+            <div className="card-title">
+              <a className="title">pH:</a>
+            </div>
+            <div className="card-content">
+              <MetricCard value={sensorData[1].value} level={sensorData[1].level} />
+            </div>
+          </div>
+          <div className="inventory-card">
+            <div className="card-title">
+              <a className="title">Conductividad:</a>
+            </div>
+            <div className="card-content">
+              <MetricCard value={sensorData[3].value} level={sensorData[3].level} />
+            </div>
+          </div>
+          <div className="inventory-card">
+            <div className="card-title">
+              <a className="title">T. Agua:</a>
+            </div>
+            <div className="card-content">
+              <MetricCard value={sensorData[0].value} level={sensorData[0].level} />
+            </div>
+          </div>
+          <div className="inventory-card">
+            <div className="card-title">
+              <a className="title">Nivel Agua:</a>
+            </div>
+            <div className="card-content">
+              <MetricCard value={sensorData[3].value} level={sensorData[3].level} />
             </div>
           </div>
         </div>
-        <div className="">
-          <a> Recomendación :</a>
+        <div className="recommendation">
+          <a>Recomendaciones :</a>
         </div>
       </div>
     </section>

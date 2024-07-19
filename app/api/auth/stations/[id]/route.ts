@@ -60,3 +60,24 @@ export async function DELETE(request: Request) {
       return NextResponse.error();
     }
   }
+
+export async function GET(request: Request, { params }: { params: { id: string } }) {
+  const { id } = params;
+
+  try {
+    await connectarBD();
+    const station = await HydroponicSystem.findById(id);
+
+    if (!station) {
+      return NextResponse.json(
+        { message: "Estación no encontrada" },
+        { status: 404 }
+      );
+    }
+
+    return NextResponse.json(station);
+  } catch (error) {
+    console.log(error);
+    return NextResponse.error();
+  }
+}
