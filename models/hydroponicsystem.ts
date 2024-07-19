@@ -3,10 +3,10 @@ import { Schema, model, models, Document, Model } from "mongoose";
 interface IHydroponicSystem extends Document {
     user: Schema.Types.ObjectId;
     name: string;
+    city: string;
     plants: Schema.Types.ObjectId[];
     sensors: {
         type: 'temperature_humidity' | 'water_temp' | 'ph' | 'ec' | 'water_level';
-        location: string;
         readings: {
             type: 'temperature' | 'humidity' | 'water_temp' | 'ph' | 'ec' | 'water_level';
             timestamp: Date;
@@ -31,6 +31,11 @@ const HydroponicSystemSchema: Schema<IHydroponicSystem> = new Schema(
             required: [true, "Nombre necesario"],
             maxlength: [100, "El nombre no puede exceder 100 caracteres"]
         },
+        city: {
+            type: String,
+            required: [true, "Ciudad necesaria"],
+            maxlength: [100, "La ciudad no puede exceder 100 caracteres"]
+        },
         plants: [{
             type: Schema.Types.ObjectId,
             ref: 'StationPlant'
@@ -40,11 +45,6 @@ const HydroponicSystemSchema: Schema<IHydroponicSystem> = new Schema(
                 type: String,
                 enum: ['temperature_humidity', 'water_temp', 'ph', 'ec', 'water_level'],
                 required: [true, "Tipo de sensor necesario"]
-            },
-            location: {
-                type: String,
-                required: [true, "Ubicación necesaria"],
-                maxlength: [100, "La ubicación no puede exceder 100 caracteres"]
             },
             readings: [{
                 type: {
@@ -80,6 +80,24 @@ const HydroponicSystemSchema: Schema<IHydroponicSystem> = new Schema(
         versionKey: false
     }
 );
+
+// Middleware to add default sensors and actuators
+HydroponicSystemSchema.pre('save', function (next) {
+    if (this.isNew) {
+        this.sensors = [
+            { type: 'temperature_humidity', readings: [] },
+            { type: 'water_temp', readings: [] },
+            { type: 'ph', readings: [] },
+            { type: 'ec', readings: [] },
+            { type: 'water_level', readings: [] }
+        ];
+        this.actuators = [
+            { type: 'pump', status: 'off' },
+            { type: 'nutrient_dispenser', status: 'off' }
+        ];
+    }
+    next();
+});
 
 const HydroponicSystem: Model<IHydroponicSystem> = models.HydroponicSystem || model<IHydroponicSystem>("HydroponicSystem", HydroponicSystemSchema);
 
