@@ -1,0 +1,241 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=Nunito:wght@200&display=swap");
+
+body {
+  padding: 0;
+  margin: 0;
+}
+
+.seccion1 {
+  display: flex;
+  width: 100%;
+}
+
+.bar1 {
+  display: flex;
+}
+
+.hola,
+.hola-true {
+  display: flex;
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  flex-direction: column;
+  align-items: center;
+  padding-left: 10px;
+  background-color: #f0f1f3;
+}
+
+.avisos-estacion,
+.avisos-estacion-true {
+  display: flex;
+  padding-top: 10px;
+  width: 100%;
+  height: 95%;
+}
+
+.estacion-container {
+  width: 100%;
+  height: 100%;
+  margin: 5px;
+  display: flex;
+  background: #fff;
+  border-radius: 8px;
+  flex: 1;
+}
+
+.Citas {
+  display: flex;
+  align-items: center;
+  height: 30px;
+  width: 200px;
+  position: absolute;
+  margin-left: 15px;
+  margin-top: 10px;
+}
+
+.Citas a {
+  color: var(--grey-grey-600, #5d6679);
+  font-family: "Inter", sans-serif;
+  font-size: 19px;
+  font-weight: 550;
+  line-height: 24px;
+}
+
+.estacion-informacion {
+  height: auto;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  overflow-y: auto;
+  max-height: 800px;
+}
+
+.estacion-cosecha {
+  color: var(--grey-grey-600, #5d6679);
+  font-family: "Inter", sans-serif;
+  font-size: 19px;
+  font-weight: 550;
+  line-height: 24px;
+  margin-bottom: 10px;
+}
+
+.Envios-Button {
+  cursor: pointer;
+  display: inline-flex;
+  padding: 10px 16px;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  border: none;
+  border-radius: 4px;
+  background: var(--primary-primary-600, #108204);
+  margin-right: 10px;
+  color: white;
+  font-family: "Inter", sans-serif;
+}
+
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-content {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 5px;
+  width: 300px;
+  text-align: center;
+}
+
+.close-button {
+  float: right;
+  cursor: pointer;
+}
+
+.modal-button {
+  margin-top: 20px;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  background: var(--primary-primary-600, #108204);
+  color: white;
+  cursor: pointer;
+  font-family: "Inter", sans-serif;
+}
+
+.plant-catalog {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
+  margin-bottom: 20px;
+}
+
+.plant-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  margin: 10px;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+}
+
+.plant-item.selected {
+  border-color: var(--primary-primary-600, #108204);
+  background-color: rgba(16, 130, 4, 0.1);
+}
+
+.plant-item:hover {
+  background-color: #f0f1f3;
+}
+
+.plant-image {
+  width: 60px;
+  height: 60px;
+  margin-bottom: 10px;
+}
+
+.cultivos-list {
+  border: 1px solid #000000;
+  margin-top: 10px;
+  width: 80%;
+  max-height: 500px; /* Para ajustar el espacio y mostrar el calendario correctamente */
+  overflow-y: auto; /* Añadir scroll si es necesario */
+}
+
+.cultivo-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  padding: 10px;
+  background-color: #f0f1f3;
+  border-radius: 5px;
+}
+
+.cultivo-item a {
+  font-family: "Inter", sans-serif;
+  font-size: 14px;
+  color: #383e49;
+}
+
+.delete-button {
+  padding: 5px 10px;
+  background-color: #ff4d4f;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.delete-button:hover {
+  background-color: #ff7875;
+}
+
+.harvested-list {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+@media (max-width: 800px) {
+  .hola,
+  .hola-true {
+    border: none;
+    width: 100%;
+    padding-left: 0px;
+    margin: 0px;
+    flex: 0 0 1;
+    background-color: #f0f1f3;
+  }
+  .hola-true {
+    opacity: 1.5;
+    background-color: rgba(0, 0, 0, 0.742);
+  }
+  .avisos-estacion,
+  .avisos-estacion-true {
+    display: flex;
+    flex-direction: column;
+    padding-top: 0px;
+    border: none;
+    width: 100%;
+    height: 100%;
+  }
+  .estacion-container {
+    width: 100%;
+    height: 50%;
+    margin: 0px;
+    margin-top: 2px;
+    border-radius: 12px;
+  }
+}

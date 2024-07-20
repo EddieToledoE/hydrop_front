@@ -1,8 +1,8 @@
-import { Schema, model, models, Document, Model } from "mongoose";
+import { Schema, model, models, Document, Model, Types } from "mongoose";
 
-interface IStationPlant extends Document {
-    system_id: Schema.Types.ObjectId;
-    plant_id: Schema.Types.ObjectId;
+export interface IStationPlant extends Document {
+    system_id: Types.ObjectId;
+    plant_id: Types.ObjectId;
     status: 'growing' | 'harvested';
     date_planted: Date;
     estimated_harvest_date: Date;

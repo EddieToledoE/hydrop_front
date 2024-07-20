@@ -39,3 +39,71 @@ Content-Type: application/json
 
 ### Obtener todas las estaciones hidropónicas por ID de usuario
 GET http://localhost:3000/api/auth/userstation?id=668dee66cf7b5b0a30fb22a4
+
+
+### Crear grupo de plantas
+POST http://localhost:3000/api/auth/plantgroup
+Content-Type: application/json
+
+{
+  "name": "C: Fresas y Tomates",
+  "optimal_temp": { "min": 18, "max": 25 },
+  "optimal_humidity": { "min": 60, "max": 80 },
+  "optimal_ph": { "min": 5.5, "max": 6.5 },
+  "optimal_ec": { "min": 1.4, "max": 5.1 }
+}
+
+### Obtener todos los grupos de plantas
+GET http://localhost:3000/api/auth/plantgroup
+
+### Obtener un grupo de plantas por ID
+GET http://localhost:3000/api/auth/plantgroup/60d21b4967d0d8992e610c86
+
+### Actualizar un grupo de plantas por ID
+PUT http://localhost:3000/api/auth/plantgroup/60d21b4967d0d8992e610c86
+Content-Type: application/json
+
+{
+  "name": "Grupo A Modificado",
+  "optimal_temp": { "min": 21, "max": 31 },
+  "optimal_humidity": { "min": 41, "max": 71 },
+  "optimal_ph": { "min": 5.6, "max": 6.6 },
+  "optimal_ec": { "min": 1.1, "max": 2.6 }
+}
+
+### Eliminar un grupo de plantas por ID
+DELETE http://localhost:3000/api/auth/plantgroup/60d21b4967d0d8992e610c86
+
+
+### Agregar planta al catálogo
+POST http://localhost:3000/api/auth/catalog
+Content-Type: application/json
+
+{
+  "name": "Fresas",
+  "harvest_days": 70,
+  "image": "/images/fresas.png",
+  "group_id": "669b41ee918648086f2c4fee"  }
+
+
+
+### Obtener todas las plantas del catálogo
+GET http://localhost:3000/api/auth/catalog
+### Agregar plantas a una estación
+POST http://localhost:3000/api/auth/plants
+Content-Type: application/json
+
+{
+  "systemId": "6699defcf167387f3335e144",
+  "plantId": "669b4561918648086f2c4ff1",
+  "count": 2
+}
+
+### Obtener plantas por ID de estación
+GET http://localhost:3000/api/auth/plants?systemId=6699defcf167387f3335e144
+
+### Obtener plantas en crecimiento
+GET http://localhost:3000/api/auth/growing-plants?systemId=6699defcf167387f3335e144
+
+### Obtener plantas cosechadas
+GET http://localhost:3000/api/auth/harvested-plants?systemId=6699defcf167387f3335e144

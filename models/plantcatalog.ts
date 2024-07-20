@@ -1,12 +1,10 @@
-import { Schema, model, models, Document, Model } from "mongoose";
+import { Schema, model, models, Document, Model, Types } from "mongoose";
 
-interface IPlantCatalog extends Document {
+export interface IPlantCatalog extends Document {
     name: string;
-    optimal_temp: number;
-    optimal_humidity: number;
-    optimal_ph: number;
-    optimal_ec: number;
-    harvest_days: number; 
+    harvest_days: number;
+    image: string;
+    group_id: Types.ObjectId; // Referencia al grupo de plantas
 }
 
 const PlantCatalogSchema: Schema<IPlantCatalog> = new Schema(
@@ -16,25 +14,18 @@ const PlantCatalogSchema: Schema<IPlantCatalog> = new Schema(
             required: [true, "Nombre necesario"],
             maxlength: [100, "El nombre no puede exceder 100 caracteres"]
         },
-        optimal_temp: {
-            type: Number,
-            required: true
-        },
-        optimal_humidity: {
-            type: Number,
-            required: true
-        },
-        optimal_ph: {
-            type: Number,
-            required: true
-        },
-        optimal_ec: {
-            type: Number,
-            required: true
-        },
         harvest_days: {
             type: Number,
             required: [true, "Días de cosecha necesarios"]
+        },
+        image: {
+            type: String,
+            required: false
+        },
+        group_id: {
+            type: Schema.Types.ObjectId,
+            ref: 'PlantGroup',
+            required: [true, "Grupo necesario"]
         }
     },
     {

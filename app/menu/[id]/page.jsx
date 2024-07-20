@@ -17,6 +17,16 @@ import Button from "@mui/material/Button";
 
 const apiKey = "002501a48460cb00c15f9e2bcf247347";
 
+// Mapeo de títulos en español a nombres de sensores en inglés
+const sensorMapping = {
+  "Temperatura": "temperature",
+  "Humedad": "humidity",
+  "pH": "ph",
+  "Conductividad": "ec",
+  "T. Agua": "water_temp",
+  "Nivel Agua": "water_level"
+};
+
 function MetricCard({ value, level }) {
   const levelColors = {
     low: "red",
@@ -112,9 +122,10 @@ export default function Home() {
   };
 
   const handleOpen = (sensorType, title) => {
+    const sensorKey = sensorMapping[title];
     setModalTitle(title);
     setOpen(true);
-    setModalData(sensorData[sensorType] || []);
+    setModalData(sensorData[sensorKey] || []);
   };
 
   const handleClose = () => {
@@ -123,8 +134,9 @@ export default function Home() {
 
   useEffect(() => {
     if (open && modalTitle) {
-      const sensorType = modalTitle.toLowerCase().replace(" ", "_");
-      setModalData(sensorData[sensorType] || []);
+      const sensorKey = sensorMapping[modalTitle];
+      console.log(`Abriendo modal para: ${sensorKey}, datos:`, sensorData[sensorKey]);
+      setModalData(sensorData[sensorKey] || []);
     }
   }, [sensorData, open, modalTitle]);
 
