@@ -10,7 +10,11 @@ import Axios from "axios";
 import { useSession } from "next-auth/react";
 import { io } from "socket.io-client";
 import { useRouter } from "next/navigation";
-import { set } from "mongoose";
+import LineChart from "@/components/graficas";
+import Modal from "@mui/material/Modal";
+import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
+
 const apiKey = "002501a48460cb00c15f9e2bcf247347";
 
 function MetricCard({ value, level }) {
@@ -20,8 +24,8 @@ function MetricCard({ value, level }) {
     medium: "yellow",
   };
 
-  const valueColorClass = level === "low" || level === "normal" || level === "medium"
-    ? "white" : "";
+  const valueColorClass =
+    level === "low" || level === "normal" || level === "medium" ? "white" : "";
 
   return (
     <div className="metric-card-container">
@@ -42,9 +46,21 @@ export default function Home() {
   const stationId = arreglo[arreglo.length - 1];
 
   const [city, setCity] = useState("");
-  const [sensorData, setSensorData] = useState({});
+  const [sensorData, setSensorData] = useState({
+    humidity: [],
+    temperature: [],
+    water_level: [],
+    ph: [],
+    ec: [],
+    water_temp: [],
+  });
   const [actuatorStatus, setActuatorStatus] = useState({});
   const [stationName, setStationName] = useState("");
+
+  const [modalData, setModalData] = useState([]);
+  const [modalTitle, setModalTitle] = useState("");
+  const [open, setOpen] = useState(false);
+
   useEffect(() => {
     if (stationId) {
       Axios.get(`/api/auth/stations/${stationId}`)
@@ -67,7 +83,15 @@ export default function Home() {
       try {
         console.log("Mensaje MQTT recibido:", message);
         const data = JSON.parse(message);
-        setSensorData(data.sensor_data);
+        setSensorData((prevData) => ({
+          ...prevData,
+          humidity: [...prevData.humidity, data.sensor_data.humidity],
+          temperature: [...prevData.temperature, data.sensor_data.temperature],
+          water_level: [...prevData.water_level, data.sensor_data.water_level],
+          ph: [...prevData.ph, data.sensor_data.ph],
+          ec: [...prevData.ec, data.sensor_data.ec],
+          water_temp: [...prevData.water_temp, data.sensor_data.water_temp],
+        }));
         setActuatorStatus(data.actuator_status);
       } catch (error) {
         console.error("Error al parsear el mensaje MQTT:", error);
@@ -86,6 +110,23 @@ export default function Home() {
       dispatch(closeBar());
     }
   };
+
+  const handleOpen = (sensorType, title) => {
+    setModalTitle(title);
+    setOpen(true);
+    setModalData(sensorData[sensorType] || []);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
+
+  useEffect(() => {
+    if (open && modalTitle) {
+      const sensorType = modalTitle.toLowerCase().replace(" ", "_");
+      setModalData(sensorData[sensorType] || []);
+    }
+  }, [sensorData, open, modalTitle]);
 
   const [weatherData, setWeatherData] = useState([]);
   const [error, setError] = useState(null);
@@ -147,14 +188,24 @@ export default function Home() {
               </div>
             </div>
           </div>
+        </div>
+        <div className="actuators-container">
           <div className="inventory-card">
             <div className="card-title">
-              <a className="title">Accionadores de : {stationName ? stationName : 'Tu estacion'}</a>
+              <a className="title">
+                Accionadores de: {stationName ? stationName : "Tu estación"}
+              </a>
             </div>
             <div className="card-content">
-              <div className="info-row">
-                <button className={`status-button ${actuatorStatus.pump_status === 'on' ? 'on' : 'off'}`}>
-                  {actuatorStatus.pump_status === 'on' ? 'Encendido' : 'Apagado'}
+              <div className="actuator-row">
+                <button
+                  className={`status-button ${
+                    actuatorStatus.pump_status === "on" ? "on" : "off"
+                  }`}
+                >
+                  {actuatorStatus.pump_status === "on"
+                    ? "Encendido"
+                    : "Apagado"}
                 </button>
                 <div className="vertical-divider"></div>
                 <button className="dispensar">Dispensar</button>
@@ -166,49 +217,89 @@ export default function Home() {
           <div className="inventory-card">
             <div className="card-title">
               <a className="title">Temperatura:</a>
+              <Button onClick={() => handleOpen("temperature", "Temperatura")}>
+                Ver Gráfica
+              </Button>
             </div>
             <div className="card-content">
-              <MetricCard value={sensorData.temperature} level={sensorData.temperature_level} />
+              <MetricCard
+                value={
+                  sensorData.temperature[sensorData.temperature.length - 1]
+                }
+                level={sensorData.temperature_level}
+              />
             </div>
           </div>
           <div className="inventory-card">
             <div className="card-title">
               <a className="title">Humedad:</a>
+              <Button onClick={() => handleOpen("humidity", "Humedad")}>
+                Ver Gráfica
+              </Button>
             </div>
             <div className="card-content">
-              <MetricCard value={sensorData.humidity} level={sensorData.humidity_level} />
+              <MetricCard
+                value={sensorData.humidity[sensorData.humidity.length - 1]}
+                level={sensorData.humidity_level}
+              />
             </div>
           </div>
           <div className="inventory-card">
             <div className="card-title">
               <a className="title">pH:</a>
+              <Button onClick={() => handleOpen("ph", "pH")}>
+                Ver Gráfica
+              </Button>
             </div>
             <div className="card-content">
-              <MetricCard value={sensorData.ph} level={sensorData.ph_level} />
+              <MetricCard
+                value={sensorData.ph[sensorData.ph.length - 1]}
+                level={sensorData.ph_level}
+              />
             </div>
           </div>
           <div className="inventory-card">
             <div className="card-title">
               <a className="title">Conductividad:</a>
+              <Button onClick={() => handleOpen("ec", "Conductividad")}>
+                Ver Gráfica
+              </Button>
             </div>
             <div className="card-content">
-              <MetricCard value={sensorData.ec} level={sensorData.ec_level} />
+              <MetricCard
+                value={sensorData.ec[sensorData.ec.length - 1]}
+                level={sensorData.ec_level}
+              />
             </div>
           </div>
           <div className="inventory-card">
             <div className="card-title">
               <a className="title">T. Agua:</a>
+              <Button onClick={() => handleOpen("water_temp", "T. Agua")}>
+                Ver Gráfica
+              </Button>
             </div>
             <div className="card-content">
-              <MetricCard value={sensorData.water_temp} level={sensorData.water_temp_level} />
+              <MetricCard
+                value={sensorData.water_temp[sensorData.water_temp.length - 1]}
+                level={sensorData.water_temp_level}
+              />
             </div>
           </div>
           <div className="inventory-card">
             <div className="card-title">
               <a className="title">Nivel Agua:</a>
+              <Button onClick={() => handleOpen("water_level", "Nivel Agua")}>
+                Ver Gráfica
+              </Button>
             </div>
             <div className="card-content">
-              <MetricCard value={sensorData.water_level} level={sensorData.water_level_level} />
+              <MetricCard
+                value={
+                  sensorData.water_level[sensorData.water_level.length - 1]
+                }
+                level={sensorData.water_level_level}
+              />
             </div>
           </div>
         </div>
@@ -216,6 +307,22 @@ export default function Home() {
           <a>Recomendaciones :</a>
         </div>
       </div>
+      <Modal open={open} onClose={handleClose}>
+        <Box
+          sx={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            width: 800,
+            bgcolor: "background.paper",
+            boxShadow: 24,
+            p: 4,
+          }}
+        >
+          <LineChart height="400px" data={modalData} title={modalTitle} />
+        </Box>
+      </Modal>
     </section>
   );
 }

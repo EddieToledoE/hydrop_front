@@ -29,7 +29,7 @@ body {
 .weather-info,
 .weather-info-active {
   display: flex;
-  padding-top: 10px;
+  padding-top: 5px;
   width: 100%;
   height: 20%;
 }
@@ -72,9 +72,8 @@ body {
 }
 
 .weather-container {
-  background-color: #ffffff;
   padding: 30px;
-  padding-top: 50px;
+  padding-top: 0px;
   border-radius: 8px;
   width: 100%;
 }
@@ -86,7 +85,6 @@ body {
 }
 
 .weather-item {
-  background-color: #ffffff;
   border-radius: 8px;
   font-family: Inter;
   font-size: 14px;
@@ -215,6 +213,30 @@ body {
   width: 100%;
 }
 
+.actuators-container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.actuator-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.modal {
+  position: "absolute";
+  top: "50%";
+  left: "50%";
+  transform: "translate(-50%, -50%)";
+  width: 800px;
+  background-color: #fff;
+  box-shadow: 24px;
+  padding: 16px;
+}
+
 @media (max-width: 800px) {
   .main-content,
   .main-content-active {
@@ -241,5 +263,13 @@ body {
   .table,
   .table-active {
     grid-template-columns: 1fr;
+  }
+  .actuators-container {
+    width: 100%;
+  }
+  .weather-info,
+  .weather-info-active,
+  .actuators-container {
+    flex-direction: column;
   }
 }
