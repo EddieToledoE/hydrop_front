@@ -1,11 +1,12 @@
-import { Schema, model, models, Document, Model, Types } from "mongoose";
+import { Schema, model, models, Document, Model } from "mongoose";
 
 export interface IStationPlant extends Document {
-    system_id: Types.ObjectId;
-    plant_id: Types.ObjectId;
+    system_id: Schema.Types.ObjectId;
+    plant_id: Schema.Types.ObjectId;
     status: 'growing' | 'harvested';
     date_planted: Date;
     estimated_harvest_date: Date;
+    actual_harvest_date?: Date; // Añadir este campo opcional
 }
 
 const StationPlantSchema: Schema<IStationPlant> = new Schema(
@@ -34,6 +35,10 @@ const StationPlantSchema: Schema<IStationPlant> = new Schema(
             type: Date,
             required: true
         },
+        actual_harvest_date: {
+            type: Date, 
+            default: null
+        }
     },
     {
         timestamps: true,

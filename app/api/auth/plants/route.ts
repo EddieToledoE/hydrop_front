@@ -5,7 +5,8 @@ import PlantCatalog, {IPlantCatalog} from "@/models/plantcatalog";
 import PlantGroup, {IPlantGroup} from "@/models/plantgroup"; // Importar PlantGroup
 import { connectarBD } from "@/libs/mongodb";
 import { Types, Document, Schema } from "mongoose";
-
+import { act } from "react";
+// Agrega plantas a una estación hidropónica
 export async function POST(request: Request) {
   const { systemId, plantId, count } = await request.json();
 
@@ -36,13 +37,12 @@ export async function POST(request: Request) {
       );
     }
 
-    const plantGroup = plant.group_id as unknown as IPlantGroup; // Conversión segura para TypeScript
+    const plantGroup = plant.group_id; // Asegurarse de que plant.group_id es del tipo correcto
 
     // Verificar que todas las plantas en la estación pertenezcan al mismo grupo
     const plantsInSystem = await StationPlant.find({ system_id: systemId }).populate<{ plant_id: IPlantCatalog }>('plant_id');
     for (const plantInSystem of plantsInSystem) {
-      const plantInSystemGroup = (plantInSystem.plant_id.group_id as unknown) as IPlantGroup;
-      if (plantInSystemGroup._id.toString() !== plantGroup._id.toString()) {
+      if (plantInSystem.plant_id.group_id.toString() !== plantGroup._id.toString()) {
         return NextResponse.json(
           {
             message: "No se pueden mezclar plantas de diferentes grupos en la misma estación.",
@@ -54,13 +54,14 @@ export async function POST(request: Request) {
       }
     }
 
-    const plants: IStationPlant[] = [];
-    const plantIds: Types.ObjectId[] = [];
+    const plants: Array<Promise<IStationPlant>> = [];
     const datePlanted = new Date();
 
     for (let i = 0; i < count; i++) {
       const estimatedHarvestDate = new Date();
       estimatedHarvestDate.setDate(datePlanted.getDate() + plant.harvest_days);
+
+  
 
       const stationPlant = new StationPlant({
         system_id: new Types.ObjectId(systemId),
@@ -68,18 +69,15 @@ export async function POST(request: Request) {
         status: 'growing',
         date_planted: datePlanted,
         estimated_harvest_date: estimatedHarvestDate,
+        actual_harvest_date: null
       });
 
-      const savedPlant = await stationPlant.save();
-      plants.push(savedPlant as IStationPlant);
-      plantIds.push(savedPlant._id);
+      plants.push(stationPlant.save());
     }
 
-    // Actualizar el documento de HydroponicSystem
-    hydroponicSystem.plants.push(...(plantIds as unknown as Schema.Types.ObjectId[]));
-    await hydroponicSystem.save();
+    const savedPlants = await Promise.all(plants);
 
-    return NextResponse.json({ message: `${count} plantas añadidas correctamente`, plants });
+    return NextResponse.json({ message: `${count} plantas añadidas correctamente`, savedPlants });
   } catch (error) {
     console.error("Error al agregar plantas a la estación:", error);
     return NextResponse.error();
@@ -87,7 +85,7 @@ export async function POST(request: Request) {
 }
 
 
-
+// Obtiene las plantas de una estación hidropónica
 export async function GET(request: Request) {
   const url = new URL(request.url);
   const systemId = url.searchParams.get('systemId');

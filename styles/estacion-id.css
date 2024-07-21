@@ -43,6 +43,42 @@ body {
   border-radius: 8px;
   flex: 1;
 }
+.estacion-container2 {
+  width: 100%;
+  height: 100%;
+  margin: 5px;
+  display: flex;
+  background: #fff;
+  border-radius: 8px;
+  flex: 1;
+  justify-content: center;
+}
+
+.estacion-info-grid {
+  margin-top: 40px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+.plant-circle {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  overflow: hidden;
+  display: flex;
+  gap: 5px;
+  justify-content: space-between;
+  align-items: center;
+  border: 1px solid #ddd;
+  cursor: pointer;
+}
+
+.plant-image-circle {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
 
 .Citas {
   display: flex;
@@ -167,11 +203,11 @@ body {
 }
 
 .cultivos-list {
-  border: 1px solid #000000;
+  
   margin-top: 10px;
   width: 80%;
-  max-height: 500px; /* Para ajustar el espacio y mostrar el calendario correctamente */
-  overflow-y: auto; /* Añadir scroll si es necesario */
+  max-height: 500px; 
+  overflow-y: auto; 
 }
 
 .cultivo-item {
@@ -190,22 +226,36 @@ body {
   color: #383e49;
 }
 
-.delete-button {
+.delete-button,
+.harvest-button {
   padding: 5px 10px;
-  background-color: #ff4d4f;
-  color: white;
   border: none;
   border-radius: 5px;
   cursor: pointer;
+}
+
+.delete-button {
+  background-color: #ff4d4f;
+  color: white;
 }
 
 .delete-button:hover {
   background-color: #ff7875;
 }
 
+.harvest-button {
+  background-color: #4caf50;
+  color: white;
+}
+
+.harvest-button:hover {
+  background-color: #66bb6a;
+}
+
 .harvested-list {
-  max-height: 400px;
+  max-height: 600px;
   overflow-y: auto;
+  justify-content: space-between;
 }
 
 @media (max-width: 800px) {

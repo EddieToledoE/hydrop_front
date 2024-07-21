@@ -57,7 +57,7 @@ Content-Type: application/json
 GET http://localhost:3000/api/auth/plantgroup
 
 ### Obtener un grupo de plantas por ID
-GET http://localhost:3000/api/auth/plantgroup/60d21b4967d0d8992e610c86
+GET http://localhost:3000/api/auth/plantgroup/669b413c918648086f2c4fea
 
 ### Actualizar un grupo de plantas por ID
 PUT http://localhost:3000/api/auth/plantgroup/60d21b4967d0d8992e610c86
@@ -107,3 +107,7 @@ GET http://localhost:3000/api/auth/growing-plants?systemId=6699defcf167387f3335e
 
 ### Obtener plantas cosechadas
 GET http://localhost:3000/api/auth/harvested-plants?systemId=6699defcf167387f3335e144
+
+### Eliminar una planta
+DELETE http://localhost:3000/api/auth/delete-plant?plantId=669c67908d3a3af46cb8afbe
+Content-Type: application/json

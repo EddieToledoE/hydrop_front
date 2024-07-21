@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import HydroponicSystem from "@/models/hydroponicsystem";
 import User from "@/models/user";
 import { connectarBD } from "@/libs/mongodb";
-
+// Crea un sistema hidropónico
 export async function POST(request: Request) {
   const { userId, name, city, plants } = await request.json();
 

@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import HydroponicSystem from "@/models/hydroponicsystem";
 import { connectarBD } from "@/libs/mongodb";
 import User from "@/models/user";
+
+//Edita un sistema hidropónico
 export async function PATCH(request: Request) {
   const { id, name, plants, sensors, actuators } = await request.json();
 
@@ -31,7 +33,7 @@ export async function PATCH(request: Request) {
   }
 }
 
-
+//Elimina un sistema hidropónico
 export async function DELETE(request: Request) {
     const { id, userId } = await request.json();
   
@@ -60,7 +62,7 @@ export async function DELETE(request: Request) {
       return NextResponse.error();
     }
   }
-
+//Obtiene un sistema hidropónico por id
 export async function GET(request: Request, { params }: { params: { id: string } }) {
   const { id } = params;
 

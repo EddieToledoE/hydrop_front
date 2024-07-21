@@ -2,7 +2,7 @@
 import { NextResponse } from "next/server";
 import HydroponicSystem from "@/models/hydroponicsystem";
 import { connectarBD } from "@/libs/mongodb";
-
+// Obtiene los sistemas hidropónicos de un usuario
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const userId = searchParams.get("id");
