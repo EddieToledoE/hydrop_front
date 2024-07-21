@@ -27,21 +27,128 @@ const sensorMapping = {
   "Nivel Agua": "water_level"
 };
 
-function MetricCard({ value, level }) {
+function MetricCard({ value, level, optimalRange }) {
   const levelColors = {
     low: "red",
     normal: "green",
-    medium: "yellow",
+    high: "red",
   };
 
   const valueColorClass =
-    level === "low" || level === "normal" || level === "medium" ? "white" : "";
+    level === "low" || level === "normal" || level === "high" ? "white" : "";
 
   return (
     <div className="metric-card-container">
       <div className={`metric-card ${levelColors[level]}`}>
         <div className={`metric-value ${valueColorClass}`}>{value}</div>
+        <div className="optimal-range">
+          Óptimo: {optimalRange ? `${optimalRange.min} - ${optimalRange.max}` : 'N/A'}
+        </div>
       </div>
+    </div>
+  );
+}
+
+function Recommendations({ sensorData, plantGroup }) {
+  const getRecommendationMessage = (sensor, level) => {
+    const messages = {
+      "temperature": {
+        "low": "La temperatura es muy baja. Considera incrementar la temperatura moviendo el sistema a un lugar más cálido o usando lámparas adicionales.",
+        "high": "La temperatura es muy alta. Considera disminuir la temperatura moviendo el sistema a un lugar más fresco, aumentando la ventilación o colocando recipientes con agua fría cerca.",
+        "normal": "La temperatura está en un nivel óptimo."
+      },
+      "humidity": {
+        "low": "La humedad es muy baja. Considera incrementar la humedad colocando bandejas con agua cerca del sistema o agrupando más plantas juntas.",
+        "high": "La humedad es muy alta. Considera disminuir la humedad mejorando la ventilación o abriendo ventanas cercanas para permitir el flujo de aire.",
+        "normal": "La humedad está en un nivel óptimo."
+      },
+      "ph": {
+        "low": "El pH es muy bajo. Considera incrementar el pH añadiendo una solución de pH Up, como bicarbonato de sodio diluido.",
+        "high": "El pH es muy alto. Considera disminuir el pH añadiendo una solución de pH Down, como vinagre diluido en agua.",
+        "normal": "El pH está en un nivel óptimo."
+      },
+      "ec": {
+        "low": "La conductividad es muy baja. Considera incrementar la conductividad añadiendo más solución nutritiva concentrada.",
+        "high": "La conductividad es muy alta. Considera disminuir la conductividad diluyendo la solución con agua destilada o filtrada.",
+        "normal": "La conductividad está en un nivel óptimo."
+      },
+      "water_temp": {
+        "low": "La temperatura del agua es muy baja. Considera incrementar la temperatura usando agua tibia al rellenar el tanque.",
+        "high": "La temperatura del agua es muy alta. Considera disminuir la temperatura añadiendo cubos de hielo al tanque o colocando el tanque en un lugar más fresco.",
+        "normal": "La temperatura del agua está en un nivel óptimo."
+      },
+      "water_level": {
+        "low": "El nivel de agua es muy bajo. Considera incrementar el nivel de agua añadiendo más agua al sistema.",
+        "high": "El nivel de agua es muy alto. Considera disminuir el nivel de agua drenando el exceso.",
+        "normal": "El nivel de agua está en un nivel óptimo."
+      }
+    };
+
+    return messages[sensor][level];
+  };
+
+  const recommendations = [];
+
+  const checkLevel = (sensorType, value, optimalRange) => {
+    if (!optimalRange) return null;
+    if (value < optimalRange.min) return "low";
+    if (value > optimalRange.max) return "high";
+    return "normal";
+  };
+
+  for (const sensor in sensorData) {
+    if (sensorData[sensor].length > 0) {
+      const latestValue = sensorData[sensor][sensorData[sensor].length - 1];
+      let level = "normal";
+      let optimalRange = null;
+
+      switch (sensor) {
+        case "temperature":
+          optimalRange = plantGroup?.optimal_temp;
+          level = checkLevel(sensor, latestValue, optimalRange);
+          break;
+        case "humidity":
+          optimalRange = plantGroup?.optimal_humidity;
+          level = checkLevel(sensor, latestValue, optimalRange);
+          break;
+        case "ph":
+          optimalRange = plantGroup?.optimal_ph;
+          level = checkLevel(sensor, latestValue, optimalRange);
+          break;
+        case "ec":
+          optimalRange = plantGroup?.optimal_ec;
+          level = checkLevel(sensor, latestValue, optimalRange);
+          break;
+        case "water_temp":
+          optimalRange = { min: 20, max: 30 };
+          level = checkLevel(sensor, latestValue, optimalRange);
+          break;
+        case "water_level":
+          optimalRange = { min: 0, max: 100 };
+          level = checkLevel(sensor, latestValue, optimalRange);
+          break;
+        default:
+          break;
+      }
+
+      if (level === "low" || level === "high") {
+        recommendations.push(getRecommendationMessage(sensor, level));
+      }
+    }
+  }
+
+  return (
+    <div className="recommendations-container">
+      <h3>Recomendaciones</h3>
+      {recommendations.length > 0 ? (
+        <ul>
+          {recommendations.map((rec, index) => (
+            <li key={index}>{rec}</li>
+          ))}
+        </ul>
+      ) : (
+        <p>Todos los niveles están dentro del rango óptimo.</p>
+      )}
     </div>
   );
 }
@@ -66,20 +173,57 @@ export default function Home() {
   });
   const [actuatorStatus, setActuatorStatus] = useState({});
   const [stationName, setStationName] = useState("");
-
+  const [plantGroup, setPlantGroup] = useState(null);
   const [modalData, setModalData] = useState([]);
   const [modalTitle, setModalTitle] = useState("");
   const [open, setOpen] = useState(false);
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   useEffect(() => {
     if (stationId) {
-      Axios.get(`/api/auth/stations/${stationId}`)
+      Axios.get(`/api/auth/station-plant-group/${stationId}`)
         .then((response) => {
           setCity(response.data.city);
           setStationName(response.data.name);
+          if (response.data.plants.length > 0) {
+            const firstPlantGroup = response.data.plants[0].plant_id.group_id;
+            setPlantGroup(firstPlantGroup);
+          }
         })
         .catch((error) => {
           console.error("Error al obtener datos de la estación:", error);
+        });
+    }
+  }, [stationId]);
+
+  useEffect(() => {
+    if (stationId) {
+      Axios.get(`http://localhost:3000/api/auth/plants?systemId=${stationId}`)
+        .then((response) => {
+          const groupId = response.data[0].plant_id.group_id;
+          setPlantGroup((prevGroup) => ({
+            ...prevGroup,
+            group_id: groupId,
+          }));
+
+          return Axios.get(`http://localhost:3000/api/auth/plantgroup/${groupId}`);
+        })
+        .then((response) => {
+          setPlantGroup((prevGroup) => ({
+            ...prevGroup,
+            optimal_temp: response.data.optimal_temp,
+            optimal_humidity: response.data.optimal_humidity,
+            optimal_ph: response.data.optimal_ph,
+            optimal_ec: response.data.optimal_ec,
+            name: response.data.name,
+          }));
+        })
+        .catch((error) => {
+          console.error("Error al obtener group_id o los datos del grupo de plantas:", error);
         });
     }
   }, [stationId]);
@@ -112,6 +256,41 @@ export default function Home() {
       socket.disconnect();
     };
   }, [stationId]);
+
+  const getLevel = (sensorType, value) => {
+    if (!plantGroup) return "normal";
+
+    let optimalRange;
+    switch (sensorType) {
+      case "temperature":
+      case "temp":
+        optimalRange = plantGroup.optimal_temp;
+        break;
+      case "humidity":
+        optimalRange = plantGroup.optimal_humidity;
+        break;
+      case "ph":
+        optimalRange = plantGroup.optimal_ph;
+        break;
+      case "ec":
+        optimalRange = plantGroup.optimal_ec;
+        break;
+      case "water_temp":
+        optimalRange = { min: 20, max: 30 };
+        break;
+      case "water_level":
+        optimalRange = { min: 0, max: 100 };
+        break;
+      default:
+        return "normal";
+    }
+
+    if (!optimalRange) return "normal";
+
+    if (value < optimalRange.min) return "low";
+    if (value > optimalRange.max) return "high";
+    return "normal";
+  };
 
   const handleDivClick = () => {
     const windowWidth = window.innerWidth;
@@ -238,7 +417,8 @@ export default function Home() {
                 value={
                   sensorData.temperature[sensorData.temperature.length - 1]
                 }
-                level={sensorData.temperature_level}
+                level={getLevel("temperature", sensorData.temperature[sensorData.temperature.length - 1])}
+                optimalRange={plantGroup?.optimal_temp}
               />
             </div>
           </div>
@@ -252,7 +432,8 @@ export default function Home() {
             <div className="card-content">
               <MetricCard
                 value={sensorData.humidity[sensorData.humidity.length - 1]}
-                level={sensorData.humidity_level}
+                level={getLevel("humidity", sensorData.humidity[sensorData.humidity.length - 1])}
+                optimalRange={plantGroup?.optimal_humidity}
               />
             </div>
           </div>
@@ -266,7 +447,8 @@ export default function Home() {
             <div className="card-content">
               <MetricCard
                 value={sensorData.ph[sensorData.ph.length - 1]}
-                level={sensorData.ph_level}
+                level={getLevel("ph", sensorData.ph[sensorData.ph.length - 1])}
+                optimalRange={plantGroup?.optimal_ph}
               />
             </div>
           </div>
@@ -280,7 +462,8 @@ export default function Home() {
             <div className="card-content">
               <MetricCard
                 value={sensorData.ec[sensorData.ec.length - 1]}
-                level={sensorData.ec_level}
+                level={getLevel("ec", sensorData.ec[sensorData.ec.length - 1])}
+                optimalRange={plantGroup?.optimal_ec}
               />
             </div>
           </div>
@@ -294,7 +477,8 @@ export default function Home() {
             <div className="card-content">
               <MetricCard
                 value={sensorData.water_temp[sensorData.water_temp.length - 1]}
-                level={sensorData.water_temp_level}
+                level={getLevel("water_temp", sensorData.water_temp[sensorData.water_temp.length - 1])}
+                optimalRange={{ min: 20, max: 30 }}
               />
             </div>
           </div>
@@ -310,14 +494,15 @@ export default function Home() {
                 value={
                   sensorData.water_level[sensorData.water_level.length - 1]
                 }
-                level={sensorData.water_level_level}
+                level={getLevel("water_level", sensorData.water_level[sensorData.water_level.length - 1])}
+                optimalRange={{ min: 0, max: 100 }}
               />
             </div>
           </div>
         </div>
-        <div className="recommendation">
-          <a>Recomendaciones :</a>
-        </div>
+        {isClient && (
+          <Recommendations sensorData={sensorData} plantGroup={plantGroup} />
+        )}
       </div>
       <Modal open={open} onClose={handleClose}>
         <Box

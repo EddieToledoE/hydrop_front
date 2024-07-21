@@ -111,3 +111,6 @@ GET http://localhost:3000/api/auth/harvested-plants?systemId=6699defcf167387f333
 ### Eliminar una planta
 DELETE http://localhost:3000/api/auth/delete-plant?plantId=669c67908d3a3af46cb8afbe
 Content-Type: application/json
+
+### Populate Get
+GET http://localhost:3000/api/auth/station-plant-group/6699defcf167387f3335e144
