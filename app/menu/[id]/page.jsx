@@ -14,6 +14,7 @@ import LineChart from "@/components/graficas";
 import Modal from "@mui/material/Modal";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
+import { set } from "mongoose";
 
 const apiKey = "002501a48460cb00c15f9e2bcf247347";
 
@@ -156,11 +157,17 @@ function Recommendations({ sensorData, plantGroup }) {
 export default function Home() {
   const isBarOpen = useSelector((state) => state.bar.isBarOpen);
   const { data: session } = useSession();
+  const [userId, setUserId] = useState("");
   const dispatch = useDispatch();
   const router = useRouter();
   const idDinamico = usePathname();
   const arreglo = idDinamico.split("/");
   const stationId = arreglo[arreglo.length - 1];
+
+  useEffect(() => {
+    setUserId(session?.user.id);
+    console.log("ID de usuario:", userId);
+  }, [session]);
 
   const [city, setCity] = useState("");
   const [sensorData, setSensorData] = useState({
@@ -171,14 +178,15 @@ export default function Home() {
     ec: [],
     water_temp: [],
   });
-  const [actuatorStatus, setActuatorStatus] = useState({});
+  const [pumpStatus, setPumpStatus] = useState("off");
+  const [nutrientDispenserStatus, setNutrientDispenserStatus] = useState("off");
   const [stationName, setStationName] = useState("");
   const [plantGroup, setPlantGroup] = useState(null);
   const [modalData, setModalData] = useState([]);
   const [modalTitle, setModalTitle] = useState("");
   const [open, setOpen] = useState(false);
   const [isClient, setIsClient] = useState(false);
-
+  const [socket, setSocket] = useState(null);
   useEffect(() => {
     setIsClient(true);
   }, []);
@@ -233,29 +241,54 @@ export default function Home() {
 
     socket.emit("join_station", stationId); // Unirse a la sala de la estación
 
-    socket.on("mqtt_message", (message) => {
-      try {
-        console.log("Mensaje MQTT recibido:", message);
-        const data = JSON.parse(message);
-        setSensorData((prevData) => ({
-          ...prevData,
-          humidity: [...prevData.humidity, data.sensor_data.humidity],
-          temperature: [...prevData.temperature, data.sensor_data.temperature],
-          water_level: [...prevData.water_level, data.sensor_data.water_level],
-          ph: [...prevData.ph, data.sensor_data.ph],
-          ec: [...prevData.ec, data.sensor_data.ec],
-          water_temp: [...prevData.water_temp, data.sensor_data.water_temp],
-        }));
-        setActuatorStatus(data.actuator_status);
-      } catch (error) {
-        console.error("Error al parsear el mensaje MQTT:", error);
-      }
+    socket.on("sensor_data", (data) => {
+      console.log("Datos del sensor recibidos:", data);
+      setSensorData((prevData) => ({
+        ...prevData,
+        humidity: [...prevData.humidity, data.humidity],
+        temperature: [...prevData.temperature, data.temperature],
+        water_level: [...prevData.water_level, data.water_level],
+        ph: [...prevData.ph, data.ph],
+        ec: [...prevData.ec, data.ec],
+        water_temp: [...prevData.water_temp, data.water_temp],
+      }));
     });
+
+    socket.on("pump_status", (data) => {
+      console.log("Estado de la bomba recibido:", data);
+      setPumpStatus(data.pump_status);
+    });
+
+    socket.on("nutrient_dispenser_status", (data) => {
+      console.log("Estado del dispensador de nutrientes recibido:", data);
+      setNutrientDispenserStatus(data.nutrient_dispenser_status);
+    });
+
+    // Mantén el socket como estado para usarlo en otras funciones
+    setSocket(socket);
 
     return () => {
       socket.disconnect();
     };
   }, [stationId]);
+
+  const sendPumpCommand = (status) => {
+    if (socket) {
+      console.log(`Enviando comando de bomba: ${status}`);
+      socket.emit('pump_command', { pump_status: status });
+    } else {
+      console.error("Socket no conectado");
+    }
+  };
+
+  const sendNutrientDispenserCommand = (status) => {
+    if (socket) {
+      console.log(`Enviando comando de dispensador de nutrientes: ${status}`);
+      socket.emit('nutrient_dispenser_command', { nutrient_dispenser_status: status });
+    } else {
+      console.error("Socket no conectado");
+    }
+  };
 
   const getLevel = (sensorType, value) => {
     if (!plantGroup) return "normal";
@@ -384,23 +417,42 @@ export default function Home() {
           <div className="inventory-card">
             <div className="card-title">
               <a className="title">
-                Accionadores de: {stationName ? stationName : "Tu estación"}
+                Estado de: {stationName ? stationName : "Tu estación"}
               </a>
             </div>
             <div className="card-content">
               <div className="actuator-row">
                 <button
-                  className={`status-button ${
-                    actuatorStatus.pump_status === "on" ? "on" : "off"
-                  }`}
+
+                  className={`status-button ${pumpStatus === "on" ? "on" : "off"}`}
                 >
-                  {actuatorStatus.pump_status === "on"
-                    ? "Encendido"
-                    : "Apagado"}
+                  Bomba de agua <br />
+                  {pumpStatus === "on" ? "Encendido" : "Apagado"}
                 </button>
                 <div className="vertical-divider"></div>
-                <button className="dispensar">Dispensar</button>
+                <button
+                  className={`status-button ${nutrientDispenserStatus === "on" ? "on" : "off"}`}
+                >
+                   Dispensador de nutrientes <br />
+                  {nutrientDispenserStatus === "on" ? "Encendido" : "Apagado"}
+                </button>
               </div>
+            </div>
+          </div>
+        </div>
+        <div className="actuators-container">
+          <div className="inventory-card">
+            <div className="card-title">
+              <a className="title">Bomba de Agua:</a>
+              <Button onClick={() => sendPumpCommand('on')}>Encender Bomba</Button>
+              <Button onClick={() => sendPumpCommand('off')}>Apagar Bomba</Button>
+            </div>
+          </div>
+          <div className="inventory-card">
+            <div className="card-title">
+              <a className="title">Dispensador de Nutrientes:</a>
+              <Button onClick={() => sendNutrientDispenserCommand('on')}>Encender Dispensador</Button>
+              <Button onClick={() => sendNutrientDispenserCommand('off')}>Apagar Dispensador</Button>
             </div>
           </div>
         </div>
@@ -414,9 +466,7 @@ export default function Home() {
             </div>
             <div className="card-content">
               <MetricCard
-                value={
-                  sensorData.temperature[sensorData.temperature.length - 1]
-                }
+                value={sensorData.temperature[sensorData.temperature.length - 1]}
                 level={getLevel("temperature", sensorData.temperature[sensorData.temperature.length - 1])}
                 optimalRange={plantGroup?.optimal_temp}
               />
@@ -491,9 +541,7 @@ export default function Home() {
             </div>
             <div className="card-content">
               <MetricCard
-                value={
-                  sensorData.water_level[sensorData.water_level.length - 1]
-                }
+                value={sensorData.water_level[sensorData.water_level.length - 1]}
                 level={getLevel("water_level", sensorData.water_level[sensorData.water_level.length - 1])}
                 optimalRange={{ min: 550, max: 999 }}
               />

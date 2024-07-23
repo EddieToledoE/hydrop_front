@@ -114,3 +114,6 @@ Content-Type: application/json
 
 ### Populate Get
 GET http://localhost:3000/api/auth/station-plant-group/6699defcf167387f3335e144
+
+### Obtener una estación hidropónica por ID
+GET http://localhost:3000/api/auth/stations/6699defcf167387f3335e144
