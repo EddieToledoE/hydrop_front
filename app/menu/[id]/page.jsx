@@ -120,11 +120,11 @@ function Recommendations({ sensorData, plantGroup }) {
           level = checkLevel(sensor, latestValue, optimalRange);
           break;
         case "water_temp":
-          optimalRange = { min: 20, max: 30 };
+          optimalRange = { min: 20, max: 35 };
           level = checkLevel(sensor, latestValue, optimalRange);
           break;
         case "water_level":
-          optimalRange = { min: 0, max: 100 };
+          optimalRange = { min: 550, max: 999 };
           level = checkLevel(sensor, latestValue, optimalRange);
           break;
         default:
@@ -276,10 +276,10 @@ export default function Home() {
         optimalRange = plantGroup.optimal_ec;
         break;
       case "water_temp":
-        optimalRange = { min: 20, max: 30 };
+        optimalRange = { min: 20, max: 35  };
         break;
       case "water_level":
-        optimalRange = { min: 0, max: 100 };
+        optimalRange = { min: 550, max: 999 };
         break;
       default:
         return "normal";
@@ -478,7 +478,7 @@ export default function Home() {
               <MetricCard
                 value={sensorData.water_temp[sensorData.water_temp.length - 1]}
                 level={getLevel("water_temp", sensorData.water_temp[sensorData.water_temp.length - 1])}
-                optimalRange={{ min: 20, max: 30 }}
+                optimalRange={{ min: 20, max: 35 }}
               />
             </div>
           </div>
@@ -495,7 +495,7 @@ export default function Home() {
                   sensorData.water_level[sensorData.water_level.length - 1]
                 }
                 level={getLevel("water_level", sensorData.water_level[sensorData.water_level.length - 1])}
-                optimalRange={{ min: 0, max: 100 }}
+                optimalRange={{ min: 550, max: 999 }}
               />
             </div>
           </div>

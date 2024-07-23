@@ -1,44 +1,79 @@
 "use client";
 import Axios, { AxiosError } from "axios";
-import { FormEvent, useState } from "react";
+import { FormEvent, useState, useEffect } from "react";
+import Swal from "sweetalert2";
 import Bar from "@/components/Bar-1";
 import Header from "@/components/Header";
 import "@/styles/Ajustes.css";
 import { useSelector, useDispatch } from "react-redux";
 import { closeBar, openBar } from "@/store/barSlice";
+import { useSession } from "next-auth/react";
 
 export default function Ajustes() {
   const [error, setError] = useState();
   const [activeSection, setActiveSection] = useState("perfil");
+  const [userName, setUserName] = useState("");
+  const [userEmail, setUserEmail] = useState("");
+
+  const [userId, setUserId] = useState("");
+  const session = useSession();
+  
+  useEffect(() => {
+    console.log(session.data);
+    console.log(session.data?.user.id);
+    setUserId(session.data?.user.id);
+    setUserName(session.data?.user.name);
+    setUserEmail(session.data?.user.email);
+  }, [session.data]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     const formdata = new FormData(e.currentTarget);
-    const persona = [
-      {
-        nombre: formdata.get("nombre"),
-        apellido: formdata.get("apellido"),
-        puesto: formdata.get("puesto"),
-      },
-    ];
 
-    try {
-      const res = await Axios.post("/api/auth/registro", {
-        email: formdata.get("email"),
-        contraseña: formdata.get("contraseña"),
-        persona: persona,
-      });
-      if (res.data) {
-        console.log(res.data);
-      } else {
-        console.log("La respuesta no contiene datos JSON válidos.");
+    const updateData = {
+      name: formdata.get("nombre"),
+      email: formdata.get("email"),
+      password: formdata.get("contraseña"),
+    };
+
+    Swal.fire({
+      title: '¿Estás seguro?',
+      text: "¿Deseas guardar los cambios?",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Sí, guardar',
+      cancelButtonText: 'Cancelar'
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          const res = await Axios.patch("/api/auth/user-update", {
+            userId,
+            ...updateData,
+          });
+
+          if (res.data) {
+            Swal.fire(
+              '¡Guardado!',
+              'Los cambios han sido guardados.',
+              'success'
+            );
+            console.log(res.data);
+          } else {
+            console.log("La respuesta no contiene datos JSON válidos.");
+          }
+        } catch (error) {
+          console.log(error);
+          if (error instanceof AxiosError) {
+            setError(error.response?.data.message);
+            Swal.fire(
+              'Error',
+              error.response?.data.message,
+              'error'
+            );
+          }
+        }
       }
-    } catch (error) {
-      console.log(error);
-      if (error instanceof AxiosError) {
-        setError(error.response?.data.message);
-      }
-    }
+    });
   };
 
   // Implementación de método para ocultar la barra
@@ -74,13 +109,13 @@ export default function Ajustes() {
                 className={activeSection === "notificaciones" ? "active" : ""}
                 onClick={() => setActiveSection("notificaciones")}
               >
-                Notificaciones
+                Estaciones
               </li>
               <li
                 className={activeSection === "seguridad" ? "active" : ""}
                 onClick={() => setActiveSection("seguridad")}
               >
-                Seguridad
+                Cultivos
               </li>
             </ul>
           </nav>
@@ -94,21 +129,24 @@ export default function Ajustes() {
                     type="text"
                     name="nombre"
                     id="nombre"
-                    placeholder="Nombre"
+                    placeholder={userName}
                   />
-                  <label htmlFor="apellido">Apellido</label>
+                  <label htmlFor="email">Email</label>
                   <input
-                    type="text"
-                    name="apellido"
-                    id="apellido"
-                    placeholder="Apellido"
+                    type="email"
+                    name="email"
+                    id="email"
+                    placeholder={userEmail}
                   />
-                  <label htmlFor="puesto">Puesto</label>
-                  <select name="puesto" id="puesto">
-                    <option value="Gerente">Gerente</option>
-                    <option value="Vendedor">Vendedor</option>
-                  </select>
+                  <label htmlFor="contraseña">Contraseña</label>
+                  <input
+                    type="password"
+                    name="contraseña"
+                    id="contraseña"
+                    placeholder="Contraseña"
+                  />
                   <button type="submit">Guardar</button>
+                  {error && <div className="error">{error}</div>}
                 </form>
               </div>
             )}
@@ -149,3 +187,4 @@ export default function Ajustes() {
     </section>
   );
 }
+8

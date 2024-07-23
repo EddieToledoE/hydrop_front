@@ -60,7 +60,7 @@ export default function CustomInputAutocomplete() {
           <input
             type="text"
             {...params.inputProps}
-            placeholder={productoSeleccionado ? "" : "Selecciona un producto"}
+            placeholder={productoSeleccionado ? "" : "Proximamente"}
           />
         </div>
       )}
