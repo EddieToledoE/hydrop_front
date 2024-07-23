@@ -164,11 +164,6 @@ export default function Home() {
   const arreglo = idDinamico.split("/");
   const stationId = arreglo[arreglo.length - 1];
 
-  useEffect(() => {
-    setUserId(session?.user.id);
-    console.log("ID de usuario:", userId);
-  }, [session]);
-
   const [city, setCity] = useState("");
   const [sensorData, setSensorData] = useState({
     humidity: [],
@@ -176,7 +171,7 @@ export default function Home() {
     water_level: [],
     ph: [],
     ec: [],
-    water_temp: [],
+    water_temp: []
   });
   const [pumpStatus, setPumpStatus] = useState("off");
   const [nutrientDispenserStatus, setNutrientDispenserStatus] = useState("off");
@@ -187,9 +182,18 @@ export default function Home() {
   const [open, setOpen] = useState(false);
   const [isClient, setIsClient] = useState(false);
   const [socket, setSocket] = useState(null);
+  const [sensorIds, setSensorIds] = useState({});
+
   useEffect(() => {
     setIsClient(true);
   }, []);
+
+  useEffect(() => {
+    if (session) {
+      setUserId(session.user.id);
+      console.log("ID de usuario:", userId);
+    }
+  }, [session]);
 
   useEffect(() => {
     if (stationId) {
@@ -210,7 +214,7 @@ export default function Home() {
 
   useEffect(() => {
     if (stationId) {
-      Axios.get(`http://localhost:3000/api/auth/plants?systemId=${stationId}`)
+      Axios.get(`/api/auth/plants?systemId=${stationId}`)
         .then((response) => {
           const groupId = response.data[0].plant_id.group_id;
           setPlantGroup((prevGroup) => ({
@@ -218,7 +222,7 @@ export default function Home() {
             group_id: groupId,
           }));
 
-          return Axios.get(`http://localhost:3000/api/auth/plantgroup/${groupId}`);
+          return Axios.get(`/api/auth/plantgroup/${groupId}`);
         })
         .then((response) => {
           setPlantGroup((prevGroup) => ({
@@ -237,7 +241,27 @@ export default function Home() {
   }, [stationId]);
 
   useEffect(() => {
-    const socket = io("http://localhost:8080");
+    if (stationId) {
+      const fetchStationData = async () => {
+        try {
+          const response = await Axios.get(`/api/auth/stations/${stationId}`);
+          const station = response.data;
+          const sensors = station.sensors.reduce((acc, sensor) => {
+            acc[sensor.type] = sensor._id;
+            return acc;
+          }, {});
+          setSensorIds(sensors);
+        } catch (error) {
+          console.error("Error fetching station data:", error);
+        }
+      };
+
+      fetchStationData();
+    }
+  }, [stationId]);
+
+  useEffect(() => {
+    const socket = io("wss://wshydrop.mirandaytoledo.com");
 
     socket.emit("join_station", stationId); // Unirse a la sala de la estación
 
@@ -252,6 +276,8 @@ export default function Home() {
         ec: [...prevData.ec, data.ec],
         water_temp: [...prevData.water_temp, data.water_temp],
       }));
+      // Aquí llamarás al endpoint para guardar los datos
+      saveSensorData(sensorIds, data);
     });
 
     socket.on("pump_status", (data) => {
@@ -270,7 +296,26 @@ export default function Home() {
     return () => {
       socket.disconnect();
     };
-  }, [stationId]);
+  }, [stationId, sensorIds]);
+
+  const saveSensorData = async (sensorIds, data) => {
+    try {
+      const readings = Object.keys(sensorIds).map(sensorType => {
+        if (data[sensorType] !== undefined && data[sensorType] !== null) {
+          return {
+            sensor: sensorIds[sensorType],
+            timestamp: new Date(),
+            value: data[sensorType]
+          };
+        }
+        return null;
+      }).filter(reading => reading !== null);
+
+      await Axios.post('/api/auth/readings', { readings });
+    } catch (error) {
+      console.error("Error saving sensor data:", error);
+    }
+  };
 
   const sendPumpCommand = (status) => {
     if (socket) {
@@ -423,7 +468,6 @@ export default function Home() {
             <div className="card-content">
               <div className="actuator-row">
                 <button
-
                   className={`status-button ${pumpStatus === "on" ? "on" : "off"}`}
                 >
                   Bomba de agua <br />

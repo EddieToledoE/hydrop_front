@@ -6,7 +6,7 @@ interface IHydroponicSystem extends Document {
     city: string;
     plants: Schema.Types.ObjectId[];
     sensors: {
-        type: 'temperature_humidity' | 'water_temp' | 'ph' | 'ec' | 'water_level';
+        type: 'temperature' | 'humidity' | 'water_temp' | 'ph' | 'ec' | 'water_level';
         readings: {
             type: 'temperature' | 'humidity' | 'water_temp' | 'ph' | 'ec' | 'water_level';
             timestamp: Date;
@@ -43,7 +43,7 @@ const HydroponicSystemSchema: Schema<IHydroponicSystem> = new Schema(
         sensors: [{
             type: {
                 type: String,
-                enum: ['temperature_humidity', 'water_temp', 'ph', 'ec', 'water_level'],
+                enum: ['temperature', 'humidity', 'water_temp', 'ph', 'ec', 'water_level'],
                 required: [true, "Tipo de sensor necesario"]
             },
             readings: [{
@@ -85,7 +85,8 @@ const HydroponicSystemSchema: Schema<IHydroponicSystem> = new Schema(
 HydroponicSystemSchema.pre('save', function (next) {
     if (this.isNew) {
         this.sensors = [
-            { type: 'temperature_humidity', readings: [] },
+            { type: 'temperature', readings: [] },
+            { type: 'humidity', readings: [] },
             { type: 'water_temp', readings: [] },
             { type: 'ph', readings: [] },
             { type: 'ec', readings: [] },

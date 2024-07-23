@@ -117,3 +117,22 @@ GET http://localhost:3000/api/auth/station-plant-group/6699defcf167387f3335e144
 
 ### Obtener una estación hidropónica por ID
 GET http://localhost:3000/api/auth/stations/6699defcf167387f3335e144
+
+
+### Agregar sensor de temperatura
+PATCH http://localhost:3000/api/auth/sensor-add
+Content-Type: application/json
+
+{
+  "systemId": "6699defcf167387f3335e144",
+  "type": "temperature"
+}
+
+### Agregar sensor de humedad
+PATCH http://localhost:3000/api/auth/sensor-add
+Content-Type: application/json
+
+{
+  "systemId": "6699defcf167387f3335e144",
+  "type": "humidity"
+}

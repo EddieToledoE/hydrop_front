@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from "react";
 import Chart from "chart.js/auto";
 import estilos from "@/styles/Grafica.css";
 
-const Grafica2 = ({ data }) => {
+const Grafica3 = ({ data }) => {
   const chartRef = useRef(null);
   const chartInstanceRef = useRef(null);
 
@@ -22,10 +22,10 @@ const Grafica2 = ({ data }) => {
         labels,
         datasets: [
           {
-            label: "Temperatura del Agua",
+            label: "Conductividad Eléctrica (EC)",
             data: values,
-            backgroundColor: "rgba(255, 99, 132, 0.2)",
-            borderColor: "rgba(255, 99, 132, 1)",
+            backgroundColor: "rgba(54, 162, 235, 0.2)",
+            borderColor: "rgba(54, 162, 235, 1)",
             borderWidth: 1,
             borderRadius: 10,
           },
@@ -48,4 +48,4 @@ const Grafica2 = ({ data }) => {
   );
 };
 
-export default Grafica2;
+export default Grafica3;
