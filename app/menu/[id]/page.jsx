@@ -261,8 +261,10 @@ export default function Home() {
   }, [stationId]);
 
   useEffect(() => {
-    const socket = io("wss://wshydrop.mirandaytoledo.com");
-
+    const socket = io(SOCKET_URL,{
+      withCredentials: true
+  });
+  
     socket.emit("join_station", stationId); // Unirse a la sala de la estación
 
     socket.on("sensor_data", (data) => {
