@@ -1,24 +1,35 @@
+import os
 import paho.mqtt.client as mqtt
 import random
 import time
 import json
 
-# Configuración del broker MQTT de CloudAMQP
-broker_url = "moose.rmq.cloudamqp.com"
-broker_port = 1883
+from dotenv import load_dotenv
 
-# Credenciales MQTT
-username = "iqyrnjwl:iqyrnjwl"
-password = "rQP4_WhDq4ZrynLBTHzbQrD3hG1TrcND"
+load_dotenv()
+
+
+broker_url = os.getenv("BROKER_URL")
+broker_port = int(os.getenv("BROKER_PORT", 1883))  # Valor por defecto 1883 si no se encuentra
+username = os.getenv("MQTT_USER")
+password = os.getenv("MQTT_PASS")
 
 # Temas MQTT
-sensor_topic = "hydrop/668dee66cf7b5b0a30fb22a4/6699defcf167387f3335e144/sensor_data"
-pump_status_topic = "hydrop/668dee66cf7b5b0a30fb22a4/6699defcf167387f3335e144/pump_status"
-nutrient_dispenser_status_topic = "hydrop/668dee66cf7b5b0a30fb22a4/6699defcf167387f3335e144/nutrient_dispenser_status"
-pump_command_topic = "hydrop/668dee66cf7b5b0a30fb22a4/6699defcf167387f3335e144/pump/command"
-nutrient_dispenser_command_topic = "hydrop/668dee66cf7b5b0a30fb22a4/6699defcf167387f3335e144/nutrient_dispenser/command"
+sensor_topic = os.getenv("SENSOR_TOPIC")
+pump_status_topic = os.getenv("PUMP_STATUS_TOPIC")
+nutrient_dispenser_status_topic = os.getenv("NUTRIENT_DISPENSER_STATUS_TOPIC")
+pump_command_topic = os.getenv("PUMP_COMMAND_TOPIC")
+nutrient_dispenser_command_topic = os.getenv("NUTRIENT_DISPENSER_COMMAND_TOPIC")
+mqtt_topic = os.getenv("MQTT_TOPIC")
 
-# Estados de los actuadores
+sensor_topic = mqtt_topic + "/sensor_data"
+pump_command_topic = mqtt_topic + "/pump/command"
+pump_status_topic = mqtt_topic + "/pump_status"
+nutrient_dispenser_command_topic = mqtt_topic + "/nutrient_dispenser/command"
+nutrient_dispenser_status_topic = mqtt_topic + "/nutrient_dispenser_status"
+
+
+# Estados de los actuadores 
 pump_status = "off"
 nutrient_dispenser_status = "off"
 

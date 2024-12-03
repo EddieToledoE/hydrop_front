@@ -15,6 +15,7 @@ import Modal from "@mui/material/Modal";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import { set } from "mongoose";
+import webworker from "../../../webworkers/readings";
 
 const apiKey = "002501a48460cb00c15f9e2bcf247347";
 
@@ -184,7 +185,7 @@ export default function Home() {
   const [isClient, setIsClient] = useState(false);
   const [socket, setSocket] = useState(null);
   const [sensorIds, setSensorIds] = useState({});
-
+  const [worker, setWorker] = useState(null);
   useEffect(() => {
     setIsClient(true);
   }, []);
@@ -265,6 +266,29 @@ export default function Home() {
   }, [stationId]);
 
   useEffect(() => {
+    // Crear el Web Worker
+    const newWorker = new Worker(
+      new URL("../../../webworkers/readings", import.meta.url),
+      { type: "module" }
+    );
+
+    newWorker.onmessage = (e) => {
+      const { success, data, error } = e.data;
+      if (success) {
+        console.log("Datos guardados correctamente:", data);
+      } else {
+        console.error("Error al guardar los datos:", error);
+      }
+    };
+
+    setWorker(newWorker);
+
+    return () => {
+      newWorker.terminate(); // Limpiar el worker cuando el componente se desmonte
+    };
+  }, []);
+
+  useEffect(() => {
     const socket = io("http://localhost:8080", {
       withCredentials: true,
     });
@@ -319,7 +343,11 @@ export default function Home() {
         })
         .filter((reading) => reading !== null);
 
-      await Axios.post("/api/auth/readings", { readings });
+      if (worker) {
+        console.log("Enviando datos al worker:", readings);
+        worker.postMessage({ readings });
+      }
+      // await Axios.post("/api/auth/readings", { readings });
     } catch (error) {
       console.error("Error saving sensor data:", error);
     }
