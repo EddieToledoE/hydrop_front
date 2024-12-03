@@ -4,12 +4,12 @@ import time
 import json
 
 # Configuración del broker MQTT de CloudAMQP
-broker_url = "toad.rmq.cloudamqp.com"
+broker_url = "moose.rmq.cloudamqp.com"
 broker_port = 1883
 
 # Credenciales MQTT
-username = "jugilxxo:jugilxxo"
-password = "aqvvDO1Y0hq2iW03wmz08TONcWdov1z0"
+username = "iqyrnjwl:iqyrnjwl"
+password = "rQP4_WhDq4ZrynLBTHzbQrD3hG1TrcND"
 
 # Temas MQTT
 sensor_topic = "hydrop/668dee66cf7b5b0a30fb22a4/6699defcf167387f3335e144/sensor_data"
@@ -57,12 +57,12 @@ def publish_status(actuator, status):
     print(f"Estado de {actuator} publicado: {status_message}")
 
 def simulate_sensor_data():
-    ph = round(random.uniform(5.5, 7.5), 2)
-    ec = round(random.uniform(1.0, 2.5), 2)
-    humidity = random.randint(30, 90)
-    temperature = random.randint(15, 38)
-    water_temp = random.randint(10, 30)
-    water_level = random.randint(0, 100)
+    ph = round(random.uniform(5.5, 5.6), 2)
+    ec = round(random.uniform(1100, 1150), 2)
+    humidity = random.randint(60, 65)
+    temperature = random.randint(27, 30)
+    water_temp = random.randint(21, 22)
+    water_level = random.randint(980, 999)
     return {
         "ph": ph,
         "ec": ec,

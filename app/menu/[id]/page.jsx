@@ -20,12 +20,12 @@ const apiKey = "002501a48460cb00c15f9e2bcf247347";
 
 // Mapeo de títulos en español a nombres de sensores en inglés
 const sensorMapping = {
-  "Temperatura": "temperature",
-  "Humedad": "humidity",
-  "pH": "ph",
-  "Conductividad": "ec",
+  Temperatura: "temperature",
+  Humedad: "humidity",
+  pH: "ph",
+  Conductividad: "ec",
   "T. Agua": "water_temp",
-  "Nivel Agua": "water_level"
+  "Nivel Agua": "water_level",
 };
 
 function MetricCard({ value, level, optimalRange }) {
@@ -43,7 +43,8 @@ function MetricCard({ value, level, optimalRange }) {
       <div className={`metric-card ${levelColors[level]}`}>
         <div className={`metric-value ${valueColorClass}`}>{value}</div>
         <div className="optimal-range">
-          Óptimo: {optimalRange ? `${optimalRange.min} - ${optimalRange.max}` : 'N/A'}
+          Óptimo:{" "}
+          {optimalRange ? `${optimalRange.min} - ${optimalRange.max}` : "N/A"}
         </div>
       </div>
     </div>
@@ -53,36 +54,36 @@ function MetricCard({ value, level, optimalRange }) {
 function Recommendations({ sensorData, plantGroup }) {
   const getRecommendationMessage = (sensor, level) => {
     const messages = {
-      "temperature": {
-        "low": "La temperatura es muy baja. Considera incrementar la temperatura moviendo el sistema a un lugar más cálido o usando lámparas adicionales.",
-        "high": "La temperatura es muy alta. Considera disminuir la temperatura moviendo el sistema a un lugar más fresco, aumentando la ventilación o colocando recipientes con agua fría cerca.",
-        "normal": "La temperatura está en un nivel óptimo."
+      temperature: {
+        low: "La temperatura es muy baja. Considera incrementar la temperatura moviendo el sistema a un lugar más cálido o usando lámparas adicionales.",
+        high: "La temperatura es muy alta. Considera disminuir la temperatura moviendo el sistema a un lugar más fresco, aumentando la ventilación o colocando recipientes con agua fría cerca.",
+        normal: "La temperatura está en un nivel óptimo.",
       },
-      "humidity": {
-        "low": "La humedad es muy baja. Considera incrementar la humedad colocando bandejas con agua cerca del sistema o agrupando más plantas juntas.",
-        "high": "La humedad es muy alta. Considera disminuir la humedad mejorando la ventilación o abriendo ventanas cercanas para permitir el flujo de aire.",
-        "normal": "La humedad está en un nivel óptimo."
+      humidity: {
+        low: "La humedad es muy baja. Considera incrementar la humedad colocando bandejas con agua cerca del sistema o agrupando más plantas juntas.",
+        high: "La humedad es muy alta. Considera disminuir la humedad mejorando la ventilación o abriendo ventanas cercanas para permitir el flujo de aire.",
+        normal: "La humedad está en un nivel óptimo.",
       },
-      "ph": {
-        "low": "El pH es muy bajo. Considera incrementar el pH añadiendo una solución de pH Up, como bicarbonato de sodio diluido.",
-        "high": "El pH es muy alto. Considera disminuir el pH añadiendo una solución de pH Down, como vinagre diluido en agua.",
-        "normal": "El pH está en un nivel óptimo."
+      ph: {
+        low: "El pH es muy bajo. Considera incrementar el pH añadiendo una solución de pH Up, como bicarbonato de sodio diluido.",
+        high: "El pH es muy alto. Considera disminuir el pH añadiendo una solución de pH Down, como vinagre diluido en agua.",
+        normal: "El pH está en un nivel óptimo.",
       },
-      "ec": {
-        "low": "La conductividad es muy baja. Considera incrementar la conductividad añadiendo más solución nutritiva concentrada.",
-        "high": "La conductividad es muy alta. Considera disminuir la conductividad diluyendo la solución con agua destilada o filtrada.",
-        "normal": "La conductividad está en un nivel óptimo."
+      ec: {
+        low: "La conductividad es muy baja. Considera incrementar la conductividad añadiendo más solución nutritiva concentrada.",
+        high: "La conductividad es muy alta. Considera disminuir la conductividad diluyendo la solución con agua destilada o filtrada.",
+        normal: "La conductividad está en un nivel óptimo.",
       },
-      "water_temp": {
-        "low": "La temperatura del agua es muy baja. Considera incrementar la temperatura usando agua tibia al rellenar el tanque.",
-        "high": "La temperatura del agua es muy alta. Considera disminuir la temperatura añadiendo cubos de hielo al tanque o colocando el tanque en un lugar más fresco.",
-        "normal": "La temperatura del agua está en un nivel óptimo."
+      water_temp: {
+        low: "La temperatura del agua es muy baja. Considera incrementar la temperatura usando agua tibia al rellenar el tanque.",
+        high: "La temperatura del agua es muy alta. Considera disminuir la temperatura añadiendo cubos de hielo al tanque o colocando el tanque en un lugar más fresco.",
+        normal: "La temperatura del agua está en un nivel óptimo.",
       },
-      "water_level": {
-        "low": "El nivel de agua es muy bajo. Considera incrementar el nivel de agua añadiendo más agua al sistema.",
-        "high": "El nivel de agua es muy alto. Considera disminuir el nivel de agua drenando el exceso.",
-        "normal": "El nivel de agua está en un nivel óptimo."
-      }
+      water_level: {
+        low: "El nivel de agua es muy bajo. Considera incrementar el nivel de agua añadiendo más agua al sistema.",
+        high: "El nivel de agua es muy alto. Considera disminuir el nivel de agua drenando el exceso.",
+        normal: "El nivel de agua está en un nivel óptimo.",
+      },
     };
 
     return messages[sensor][level];
@@ -171,7 +172,7 @@ export default function Home() {
     water_level: [],
     ph: [],
     ec: [],
-    water_temp: []
+    water_temp: [],
   });
   const [pumpStatus, setPumpStatus] = useState("off");
   const [nutrientDispenserStatus, setNutrientDispenserStatus] = useState("off");
@@ -235,7 +236,10 @@ export default function Home() {
           }));
         })
         .catch((error) => {
-          console.error("Error al obtener group_id o los datos del grupo de plantas:", error);
+          console.error(
+            "Error al obtener group_id o los datos del grupo de plantas:",
+            error
+          );
         });
     }
   }, [stationId]);
@@ -261,10 +265,10 @@ export default function Home() {
   }, [stationId]);
 
   useEffect(() => {
-    const socket = io(SOCKET_URL,{
-      withCredentials: true
-  });
-  
+    const socket = io("http://localhost:8080", {
+      withCredentials: true,
+    });
+
     socket.emit("join_station", stationId); // Unirse a la sala de la estación
 
     socket.on("sensor_data", (data) => {
@@ -302,18 +306,20 @@ export default function Home() {
 
   const saveSensorData = async (sensorIds, data) => {
     try {
-      const readings = Object.keys(sensorIds).map(sensorType => {
-        if (data[sensorType] !== undefined && data[sensorType] !== null) {
-          return {
-            sensor: sensorIds[sensorType],
-            timestamp: new Date(),
-            value: data[sensorType]
-          };
-        }
-        return null;
-      }).filter(reading => reading !== null);
+      const readings = Object.keys(sensorIds)
+        .map((sensorType) => {
+          if (data[sensorType] !== undefined && data[sensorType] !== null) {
+            return {
+              sensor: sensorIds[sensorType],
+              timestamp: new Date(),
+              value: data[sensorType],
+            };
+          }
+          return null;
+        })
+        .filter((reading) => reading !== null);
 
-      await Axios.post('/api/auth/readings', { readings });
+      await Axios.post("/api/auth/readings", { readings });
     } catch (error) {
       console.error("Error saving sensor data:", error);
     }
@@ -322,7 +328,7 @@ export default function Home() {
   const sendPumpCommand = (status) => {
     if (socket) {
       console.log(`Enviando comando de bomba: ${status}`);
-      socket.emit('pump_command', { pump_status: status });
+      socket.emit("pump_command", { pump_status: status });
     } else {
       console.error("Socket no conectado");
     }
@@ -331,7 +337,9 @@ export default function Home() {
   const sendNutrientDispenserCommand = (status) => {
     if (socket) {
       console.log(`Enviando comando de dispensador de nutrientes: ${status}`);
-      socket.emit('nutrient_dispenser_command', { nutrient_dispenser_status: status });
+      socket.emit("nutrient_dispenser_command", {
+        nutrient_dispenser_status: status,
+      });
     } else {
       console.error("Socket no conectado");
     }
@@ -356,7 +364,7 @@ export default function Home() {
         optimalRange = plantGroup.optimal_ec;
         break;
       case "water_temp":
-        optimalRange = { min: 20, max: 35  };
+        optimalRange = { min: 20, max: 35 };
         break;
       case "water_level":
         optimalRange = { min: 550, max: 999 };
@@ -394,7 +402,10 @@ export default function Home() {
   useEffect(() => {
     if (open && modalTitle) {
       const sensorKey = sensorMapping[modalTitle];
-      console.log(`Abriendo modal para: ${sensorKey}, datos:`, sensorData[sensorKey]);
+      console.log(
+        `Abriendo modal para: ${sensorKey}, datos:`,
+        sensorData[sensorKey]
+      );
       setModalData(sensorData[sensorKey] || []);
     }
   }, [sensorData, open, modalTitle]);
@@ -470,16 +481,20 @@ export default function Home() {
             <div className="card-content">
               <div className="actuator-row">
                 <button
-                  className={`status-button ${pumpStatus === "on" ? "on" : "off"}`}
+                  className={`status-button ${
+                    pumpStatus === "on" ? "on" : "off"
+                  }`}
                 >
                   Bomba de agua <br />
                   {pumpStatus === "on" ? "Encendido" : "Apagado"}
                 </button>
                 <div className="vertical-divider"></div>
                 <button
-                  className={`status-button ${nutrientDispenserStatus === "on" ? "on" : "off"}`}
+                  className={`status-button ${
+                    nutrientDispenserStatus === "on" ? "on" : "off"
+                  }`}
                 >
-                   Dispensador de nutrientes <br />
+                  Dispensador de nutrientes <br />
                   {nutrientDispenserStatus === "on" ? "Encendido" : "Apagado"}
                 </button>
               </div>
@@ -490,15 +505,23 @@ export default function Home() {
           <div className="inventory-card">
             <div className="card-title">
               <a className="title">Bomba de Agua:</a>
-              <Button onClick={() => sendPumpCommand('on')}>Encender Bomba</Button>
-              <Button onClick={() => sendPumpCommand('off')}>Apagar Bomba</Button>
+              <Button onClick={() => sendPumpCommand("on")}>
+                Encender Bomba
+              </Button>
+              <Button onClick={() => sendPumpCommand("off")}>
+                Apagar Bomba
+              </Button>
             </div>
           </div>
           <div className="inventory-card">
             <div className="card-title">
               <a className="title">Dispensador de Nutrientes:</a>
-              <Button onClick={() => sendNutrientDispenserCommand('on')}>Encender Dispensador</Button>
-              <Button onClick={() => sendNutrientDispenserCommand('off')}>Apagar Dispensador</Button>
+              <Button onClick={() => sendNutrientDispenserCommand("on")}>
+                Encender Dispensador
+              </Button>
+              <Button onClick={() => sendNutrientDispenserCommand("off")}>
+                Apagar Dispensador
+              </Button>
             </div>
           </div>
         </div>
@@ -512,8 +535,13 @@ export default function Home() {
             </div>
             <div className="card-content">
               <MetricCard
-                value={sensorData.temperature[sensorData.temperature.length - 1]}
-                level={getLevel("temperature", sensorData.temperature[sensorData.temperature.length - 1])}
+                value={
+                  sensorData.temperature[sensorData.temperature.length - 1]
+                }
+                level={getLevel(
+                  "temperature",
+                  sensorData.temperature[sensorData.temperature.length - 1]
+                )}
                 optimalRange={plantGroup?.optimal_temp}
               />
             </div>
@@ -528,7 +556,10 @@ export default function Home() {
             <div className="card-content">
               <MetricCard
                 value={sensorData.humidity[sensorData.humidity.length - 1]}
-                level={getLevel("humidity", sensorData.humidity[sensorData.humidity.length - 1])}
+                level={getLevel(
+                  "humidity",
+                  sensorData.humidity[sensorData.humidity.length - 1]
+                )}
                 optimalRange={plantGroup?.optimal_humidity}
               />
             </div>
@@ -573,7 +604,10 @@ export default function Home() {
             <div className="card-content">
               <MetricCard
                 value={sensorData.water_temp[sensorData.water_temp.length - 1]}
-                level={getLevel("water_temp", sensorData.water_temp[sensorData.water_temp.length - 1])}
+                level={getLevel(
+                  "water_temp",
+                  sensorData.water_temp[sensorData.water_temp.length - 1]
+                )}
                 optimalRange={{ min: 20, max: 35 }}
               />
             </div>
@@ -587,8 +621,13 @@ export default function Home() {
             </div>
             <div className="card-content">
               <MetricCard
-                value={sensorData.water_level[sensorData.water_level.length - 1]}
-                level={getLevel("water_level", sensorData.water_level[sensorData.water_level.length - 1])}
+                value={
+                  sensorData.water_level[sensorData.water_level.length - 1]
+                }
+                level={getLevel(
+                  "water_level",
+                  sensorData.water_level[sensorData.water_level.length - 1]
+                )}
                 optimalRange={{ min: 550, max: 999 }}
               />
             </div>
